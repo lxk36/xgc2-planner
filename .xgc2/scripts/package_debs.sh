@@ -195,7 +195,7 @@ case "${PACKAGE_GROUP}" in
   gcopter)
     build_ros_group_deb \
       "${gcopter_pkg}" \
-      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap (>= 1.1.4-9)" \
+      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap (>= 1.1.4-10)" \
       "XGC2 GCOPTER trajectory optimizer for ROS1" \
       gcopter
     ;;
@@ -267,7 +267,7 @@ case "${PACKAGE_GROUP}" in
       "XGC2 ROS1 complete planner package set"
     build_meta_deb \
       "${meta_pkg}" \
-      "${all_meta_pkg} (>= 1.1.0-9)" \
+      "${all_meta_pkg} (>= 1.1.0-10)" \
       "XGC2 ROS1 default planner metapackage"
     ;;
   *)
