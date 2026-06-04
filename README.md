@@ -18,12 +18,11 @@ the procedural point-cloud map generator is installed automatically.
 
 ## Smoke Test
 
-These commands only check package discovery and launch-file resolution:
+These commands check package discovery:
 
 ```bash
 source /opt/ros/noetic/setup.bash
 rospack find gcopter
-roslaunch --files gcopter global_planning.launch
 ```
 
 To run the demo:

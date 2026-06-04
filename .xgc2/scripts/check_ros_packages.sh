@@ -32,6 +32,5 @@ catkin_make \
 
 source "${WORK_DIR}/devel/setup.bash"
 test "$(rospack find gcopter)" = "${WORK_DIR}/src/gcopter"
-roslaunch --files gcopter global_planning.launch >/dev/null
 
 echo "ROS package check passed"

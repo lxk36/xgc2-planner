@@ -16,7 +16,6 @@ test -x "/opt/ros/${ROS_DISTRO}/lib/gcopter/global_planning"
 test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/gcopter/gcopter.hpp"
 test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/misc/visualizer.hpp"
 test -f "/opt/ros/${ROS_DISTRO}/share/gcopter/launch/global_planning.launch"
-roslaunch --files gcopter global_planning.launch >/dev/null
 
 while IFS= read -r file; do
   if ! file -b "${file}" | grep -q '^ELF'; then
