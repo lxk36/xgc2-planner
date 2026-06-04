@@ -17,6 +17,7 @@ jobs:
         run: .xgc2/scripts/check_package_compliance.sh
 
   deb-build:
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
