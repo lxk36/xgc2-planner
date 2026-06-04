@@ -97,6 +97,7 @@ build_ros_package_deb() {
 }
 
 gcopter_pkg="ros-noetic-xgc2-gcopter"
+all_meta_pkg="ros-noetic-xgc2-planner-all"
 meta_pkg="ros-noetic-xgc2-planner"
 
 build_ros_package_deb \
@@ -105,14 +106,24 @@ build_ros_package_deb \
   "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap" \
   "XGC2 GCOPTER trajectory optimizer for ROS1"
 
+all_meta_root="${BUILD_DIR}/${all_meta_pkg}"
+rm -rf "${all_meta_root}"
+mkdir -p "${all_meta_root}"
+write_control \
+  "${all_meta_root}" \
+  "${all_meta_pkg}" \
+  "${gcopter_pkg} (= ${VERSION})" \
+  "XGC2 ROS1 complete planner package set"
+fakeroot dpkg-deb --build "${all_meta_root}" "${OUTPUT_DIR}/${all_meta_pkg}_${VERSION}_${ARCH}.deb" >/dev/null
+
 meta_root="${BUILD_DIR}/${meta_pkg}"
 rm -rf "${meta_root}"
 mkdir -p "${meta_root}"
 write_control \
   "${meta_root}" \
   "${meta_pkg}" \
-  "${gcopter_pkg} (= ${VERSION})" \
-  "XGC2 ROS1 planner package set"
+  "${all_meta_pkg} (= ${VERSION})" \
+  "XGC2 ROS1 default planner metapackage"
 fakeroot dpkg-deb --build "${meta_root}" "${OUTPUT_DIR}/${meta_pkg}_${VERSION}_${ARCH}.deb" >/dev/null
 
 find "${OUTPUT_DIR}" -maxdepth 1 -type f -name '*.deb' -print | sort

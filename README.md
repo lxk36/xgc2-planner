@@ -5,6 +5,8 @@ ROS1 Noetic planner package repository for XGC2.
 ## Packages
 
 - `gcopter`: GCOPTER global multicopter trajectory optimizer and demo launch.
+- `ros-noetic-xgc2-planner-all`: metapackage for all planner packages.
+- `ros-noetic-xgc2-planner`: default metapackage that depends on `planner-all`.
 
 ## Install
 

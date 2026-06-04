@@ -5,6 +5,7 @@ ROS_DISTRO="${ROS_DISTRO:-noetic}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 
 dpkg -s ros-noetic-xgc2-planner >/dev/null
+dpkg -s ros-noetic-xgc2-planner-all >/dev/null
 dpkg -s ros-noetic-xgc2-gcopter >/dev/null
 dpkg -s ros-noetic-xgc2-mockamap >/dev/null
 dpkg -s libompl15 >/dev/null

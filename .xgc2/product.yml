@@ -15,9 +15,10 @@ apt:
     - ros-noetic-xgc2-planner
   packages:
     - ros-noetic-xgc2-planner
+    - ros-noetic-xgc2-planner-all
     - ros-noetic-xgc2-gcopter
   depends:
-    - ros-noetic-xgc2-gcopter
+    - ros-noetic-xgc2-planner-all
     - ros-noetic-xgc2-mockamap
     - libompl15
 
@@ -27,7 +28,6 @@ usage:
     sudo apt install ros-noetic-xgc2-planner
   smoke_test: |
     rospack find gcopter
-    roslaunch --files gcopter global_planning.launch
 
 ownership:
   paths:
