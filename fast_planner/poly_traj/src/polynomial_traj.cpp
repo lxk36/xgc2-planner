@@ -1,0 +1,575 @@
+/**
+* This file is part of Fast-Planner.
+*
+* Copyright 2019 Boyu Zhou, Aerial Robotics Group, Hong Kong University of Science and Technology, <uav.ust.hk>
+* Developed by Boyu Zhou <bzhouai at connect dot ust dot hk>, <uv dot boyuzhou at gmail dot com>
+* for more information see <https://github.com/HKUST-Aerial-Robotics/Fast-Planner>.
+* If you use this code, please cite the respective publications as
+* listed on the above website.
+*
+* Fast-Planner is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Fast-Planner is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with Fast-Planner. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+
+#include <iostream>
+#include <poly_traj/polynomial_traj.h>
+
+/**
+ * @brief 生成最小Snap轨迹(Minimum Snap Trajectory)
+ * @details 该函数通过闭式解计算生成平滑的多项式轨迹，最小化Snap(加速度的导数)
+ *          使用五次多项式表示每段轨迹，确保连续性并满足起终点的位置、速度、加速度约束
+ *
+ * @param Pos 路径点矩阵，每行是一个3D位置 [x, y, z]
+ * @param start_vel 起点速度
+ * @param end_vel 终点速度
+ * @param start_acc 起点加速度
+ * @param end_acc 终点加速度
+ * @param Time 每段轨迹的时间分配向量
+ * @return PolynomialTraj 生成的多项式轨迹对象
+ */
+PolynomialTraj minSnapTraj(const Eigen::MatrixXd& Pos, const Eigen::Vector3d& start_vel,
+                           const Eigen::Vector3d& end_vel, const Eigen::Vector3d& start_acc,
+                           const Eigen::Vector3d& end_acc, const Eigen::VectorXd& Time) {
+  int seg_num = Time.size();  // 轨迹段数
+  Eigen::MatrixXd poly_coeff(seg_num, 3 * 6);  // 多项式系数矩阵，每行存储一段轨迹的x,y,z三个方向的6个系数
+  Eigen::VectorXd Px(6 * seg_num), Py(6 * seg_num), Pz(6 * seg_num);  // x,y,z三个方向的多项式系数向量
+
+  int num_f, num_p;  // number of fixed and free variables (固定变量和自由变量的数量)
+  int num_d;         // number of all segments' derivatives (所有段的导数总数)
+
+  // Lambda函数：计算阶乘
+  const static auto Factorial = [](int x) {
+    int fac = 1;
+    for (int i = x; i > 0; i--)
+      fac = fac * i;
+    return fac;
+  };
+
+  /* ---------- 构建端点导数约束向量 ---------- */
+  // 每段轨迹有6个约束：起点位置、终点位置、起点速度、终点速度、起点加速度、终点加速度
+  Eigen::VectorXd Dx = Eigen::VectorXd::Zero(seg_num * 6);  // x方向的导数约束
+  Eigen::VectorXd Dy = Eigen::VectorXd::Zero(seg_num * 6);  // y方向的导数约束
+  Eigen::VectorXd Dz = Eigen::VectorXd::Zero(seg_num * 6);  // z方向的导数约束
+
+  for (int k = 0; k < seg_num; k++) {
+    /* 位置约束转为导数形式 */
+    // 每段的起点位置 (第0个导数)
+    Dx(k * 6) = Pos(k, 0);
+    Dx(k * 6 + 1) = Pos(k + 1, 0);  // 每段的终点位置 (第1个导数)
+    Dy(k * 6) = Pos(k, 1);
+    Dy(k * 6 + 1) = Pos(k + 1, 1);
+    Dz(k * 6) = Pos(k, 2);
+    Dz(k * 6 + 1) = Pos(k + 1, 2);
+
+    if (k == 0) {
+      // 第一段的起点速度约束
+      Dx(k * 6 + 2) = start_vel(0);
+      Dy(k * 6 + 2) = start_vel(1);
+      Dz(k * 6 + 2) = start_vel(2);
+
+      // 第一段的起点加速度约束
+      Dx(k * 6 + 4) = start_acc(0);
+      Dy(k * 6 + 4) = start_acc(1);
+      Dz(k * 6 + 4) = start_acc(2);
+    } else if (k == seg_num - 1) {
+      // 最后一段的终点速度约束
+      Dx(k * 6 + 3) = end_vel(0);
+      Dy(k * 6 + 3) = end_vel(1);
+      Dz(k * 6 + 3) = end_vel(2);
+
+      // 最后一段的终点加速度约束
+      Dx(k * 6 + 5) = end_acc(0);
+      Dy(k * 6 + 5) = end_acc(1);
+      Dz(k * 6 + 5) = end_acc(2);
+    }
+  }
+
+  /* ---------- 构建映射矩阵A (从多项式系数到导数约束) ---------- */
+  // A矩阵将多项式系数映射到端点的位置、速度、加速度
+  // 五次多项式形式: p(t) = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5
+  Eigen::MatrixXd Ab;
+  Eigen::MatrixXd A = Eigen::MatrixXd::Zero(seg_num * 6, seg_num * 6);
+
+  for (int k = 0; k < seg_num; k++) {
+    Ab = Eigen::MatrixXd::Zero(6, 6);
+    for (int i = 0; i < 3; i++) {  // i=0:位置, i=1:速度, i=2:加速度
+      // 每段起点的第i阶导数 (t=0时)
+      Ab(2 * i, i) = Factorial(i);
+      // 每段终点的第i阶导数 (t=T时)
+      for (int j = i; j < 6; j++)
+        Ab(2 * i + 1, j) = Factorial(j) / Factorial(j - i) * pow(Time(k), j - i);
+    }
+    // 将每段的映射矩阵填入总矩阵A的对角块
+    A.block(k * 6, k * 6, 6, 6) = Ab;
+  }
+
+  /* ---------- 构建选择矩阵C' (分离固定变量和自由变量) ---------- */
+  // C矩阵用于分离已知约束(固定变量)和未知约束(自由变量)
+  // 固定变量：起点和终点的位置、速度、加速度，以及中间路径点的位置
+  // 自由变量：中间路径点的速度和加速度
+  Eigen::MatrixXd Ct, C;
+
+  num_f = 2 * seg_num + 4;  // 固定变量数: 起点3个(位置,速度,加速度) + 终点3个 + 中间点位置(seg_num-1)*2 = 2m + 4
+  num_p = 2 * seg_num - 2;  // 自由变量数: 中间点的速度和加速度 (seg_num - 1) * 2 = 2m - 2
+  num_d = 6 * seg_num;      // 总导数约束数
+  Ct = Eigen::MatrixXd::Zero(num_d, num_f + num_p);  // C矩阵的转置
+  // 填充起点约束 (第一段的起点)
+  Ct(0, 0) = 1;  // 起点位置
+  Ct(2, 1) = 1;  // 起点速度
+  Ct(4, 2) = 1;  // 起点加速度
+  // 填充第一段的终点位置约束
+  Ct(1, 3) = 1;
+  Ct(3, 2 * seg_num + 4) = 1;      // 终点速度(自由变量)
+  Ct(5, 2 * seg_num + 5) = 1;      // 终点加速度(自由变量)
+
+  // 填充终点约束 (最后一段的终点)
+  Ct(6 * (seg_num - 1) + 0, 2 * seg_num + 0) = 1;  // 终点位置
+  Ct(6 * (seg_num - 1) + 1, 2 * seg_num + 1) = 1;  // 终点位置
+  Ct(6 * (seg_num - 1) + 2, 4 * seg_num + 0) = 1;  // 终点速度(自由变量)
+  Ct(6 * (seg_num - 1) + 3, 2 * seg_num + 2) = 1;  // 终点速度
+  Ct(6 * (seg_num - 1) + 4, 4 * seg_num + 1) = 1;  // 终点加速度(自由变量)
+  Ct(6 * (seg_num - 1) + 5, 2 * seg_num + 3) = 1;  // 终点加速度
+
+  // 填充中间路径点的约束
+  for (int j = 2; j < seg_num; j++) {
+    Ct(6 * (j - 1) + 0, 2 + 2 * (j - 1) + 0) = 1;  // 中间点位置(固定)
+    Ct(6 * (j - 1) + 1, 2 + 2 * (j - 1) + 1) = 1;  // 中间点位置(固定)
+    Ct(6 * (j - 1) + 2, 2 * seg_num + 4 + 2 * (j - 2) + 0) = 1;  // 速度(自由)
+    Ct(6 * (j - 1) + 3, 2 * seg_num + 4 + 2 * (j - 1) + 0) = 1;  // 速度(自由)
+    Ct(6 * (j - 1) + 4, 2 * seg_num + 4 + 2 * (j - 2) + 1) = 1;  // 加速度(自由)
+    Ct(6 * (j - 1) + 5, 2 * seg_num + 4 + 2 * (j - 1) + 1) = 1;  // 加速度(自由)
+  }
+
+  C = Ct.transpose();  // 转置得到选择矩阵C
+
+  // 将导数约束向量映射到固定和自由变量空间
+  Eigen::VectorXd Dx1 = C * Dx;
+  Eigen::VectorXd Dy1 = C * Dy;
+  Eigen::VectorXd Dz1 = C * Dz;
+
+  /* ---------- 构建最小Snap代价矩阵Q ---------- */
+  // Q矩阵定义了轨迹的平滑性代价，最小化Snap (Jerk的导数，即四阶导数)
+  // Snap = d^4p/dt^4，对应多项式系数c3, c4, c5
+  Eigen::MatrixXd Q = Eigen::MatrixXd::Zero(seg_num * 6, seg_num * 6);
+
+  for (int k = 0; k < seg_num; k++) {
+    for (int i = 3; i < 6; i++) {  // i>=3: 从Jerk开始(三阶导数以上)
+      for (int j = 3; j < 6; j++) {
+        // Q矩阵元素：∫[d^4p/dt^4]^2 dt 的Hessian矩阵
+        Q(k * 6 + i, k * 6 + j) =
+            i * (i - 1) * (i - 2) * j * (j - 1) * (j - 2) / (i + j - 5) * pow(Time(k), (i + j - 5));
+      }
+    }
+  }
+
+  /* ---------- 计算R矩阵 (映射到导数空间的代价矩阵) ---------- */
+  // R = C * A^(-T) * Q * A^(-1) * C^T
+  // 将多项式系数空间的代价矩阵Q映射到导数约束空间
+  Eigen::MatrixXd R = C * A.transpose().inverse() * Q * A.inverse() * Ct;
+
+  // 提取固定变量对应的导数约束
+  Eigen::VectorXd Dxf(2 * seg_num + 4), Dyf(2 * seg_num + 4), Dzf(2 * seg_num + 4);
+
+  Dxf = Dx1.segment(0, 2 * seg_num + 4);  // 固定变量部分
+  Dyf = Dy1.segment(0, 2 * seg_num + 4);
+  Dzf = Dz1.segment(0, 2 * seg_num + 4);
+
+  // 分块R矩阵：将固定变量(f)和自由变量(p)分开
+  // R = [Rff, Rfp]
+  //     [Rpf, Rpp]
+  Eigen::MatrixXd Rff(2 * seg_num + 4, 2 * seg_num + 4);  // 固定-固定
+  Eigen::MatrixXd Rfp(2 * seg_num + 4, 2 * seg_num - 2);  // 固定-自由
+  Eigen::MatrixXd Rpf(2 * seg_num - 2, 2 * seg_num + 4);  // 自由-固定
+  Eigen::MatrixXd Rpp(2 * seg_num - 2, 2 * seg_num - 2);  // 自由-自由
+
+  Rff = R.block(0, 0, 2 * seg_num + 4, 2 * seg_num + 4);
+  Rfp = R.block(0, 2 * seg_num + 4, 2 * seg_num + 4, 2 * seg_num - 2);
+  Rpf = R.block(2 * seg_num + 4, 0, 2 * seg_num - 2, 2 * seg_num + 4);
+  Rpp = R.block(2 * seg_num + 4, 2 * seg_num + 4, 2 * seg_num - 2, 2 * seg_num - 2);
+
+  /* ---------- 闭式解求解自由变量 ---------- */
+  // 最小化代价函数 J = [Df, Dp]^T * R * [Df, Dp]
+  // 对Dp求偏导并令其为0，得到闭式解: Dp = -Rpp^(-1) * Rfp^T * Df
+  Eigen::VectorXd Dxp(2 * seg_num - 2), Dyp(2 * seg_num - 2), Dzp(2 * seg_num - 2);
+  Dxp = -(Rpp.inverse() * Rfp.transpose()) * Dxf;  // 计算x方向的自由变量
+  Dyp = -(Rpp.inverse() * Rfp.transpose()) * Dyf;  // 计算y方向的自由变量
+  Dzp = -(Rpp.inverse() * Rfp.transpose()) * Dzf;  // 计算z方向的自由变量
+
+  // 将计算得到的自由变量填回完整的导数约束向量
+  Dx1.segment(2 * seg_num + 4, 2 * seg_num - 2) = Dxp;
+  Dy1.segment(2 * seg_num + 4, 2 * seg_num - 2) = Dyp;
+  Dz1.segment(2 * seg_num + 4, 2 * seg_num - 2) = Dzp;
+
+  // 通过映射矩阵A^(-1)将导数约束转换为多项式系数
+  Px = (A.inverse() * Ct) * Dx1;
+  Py = (A.inverse() * Ct) * Dy1;
+  Pz = (A.inverse() * Ct) * Dz1;
+
+  // 将多项式系数向量重组为矩阵形式，每行对应一段轨迹
+  for (int i = 0; i < seg_num; i++) {
+    poly_coeff.block(i, 0, 1, 6) = Px.segment(i * 6, 6).transpose();    // x方向的6个系数
+    poly_coeff.block(i, 6, 1, 6) = Py.segment(i * 6, 6).transpose();    // y方向的6个系数
+    poly_coeff.block(i, 12, 1, 6) = Pz.segment(i * 6, 6).transpose();   // z方向的6个系数
+  }
+
+  /* ---------- 构建多项式轨迹对象 ---------- */
+  PolynomialTraj poly_traj;
+  for (int i = 0; i < poly_coeff.rows(); ++i) {
+    vector<double> cx(6), cy(6), cz(6);
+    // 提取每段的系数
+    for (int j = 0; j < 6; ++j) {
+      cx[j] = poly_coeff(i, j), cy[j] = poly_coeff(i, j + 6), cz[j] = poly_coeff(i, j + 12);
+    }
+    // 反转系数顺序以匹配多项式表示习惯 (从高次到低次)
+    reverse(cx.begin(), cx.end());
+    reverse(cy.begin(), cy.end());
+    reverse(cz.begin(), cz.end());
+    double ts = Time(i);
+    // 添加轨迹段
+    poly_traj.addSegment(cx, cy, cz, ts);
+  }
+
+  return poly_traj;
+}
+
+/**
+ * @brief 生成快速直线轨迹 (四次多项式，7段式)
+ * @details 生成从起点到终点的直线轨迹，满足最大速度、加速度和Jerk约束
+ *          轨迹分为7段：加速→匀加速→减加速→匀速→加速减速→匀减速→减速停止
+ *          使用S型速度曲线，确保平滑过渡
+ *
+ * @param start 起点位置
+ * @param end 终点位置
+ * @param max_vel 最大速度
+ * @param max_acc 最大加速度
+ * @param max_jerk 最大Jerk(加速度变化率)
+ * @return PolynomialTraj 生成的多项式轨迹
+ */
+PolynomialTraj fastLine4deg(Eigen::Vector3d start, Eigen::Vector3d end, double max_vel, double max_acc,
+                            double max_jerk) {
+  Eigen::Vector3d disp = end - start;  // 位移向量
+  double len = disp.norm();            // 位移长度
+  Eigen::Vector3d dir = disp.normalized();  // 单位方向向量
+
+  // 获取缩放向量：找到位移最大的轴向，用于归一化
+  int max_id = -1;
+  double max_dist = -1.0;
+  for (int i = 0; i < 3; ++i) {
+    if (fabs(disp(i)) > max_dist) {
+      max_dist = disp(i);
+      max_id = i;
+    }
+  }
+  Eigen::Vector3d scale_vec = disp / max_dist;  // 缩放向量，保证各轴比例正确
+
+  PolynomialTraj poly_traj;
+  vector<double> cx(6), cy(6), cz(6), zero(6);
+  for (int i = 0; i < 6; ++i)
+    zero[i] = 0.0;
+
+  // 初始状态：静止于起点
+  Eigen::Vector3d p0 = start;
+  Eigen::Vector3d v0 = Eigen::Vector3d::Zero();  // 初始速度为0
+  Eigen::Vector3d a0 = Eigen::Vector3d::Zero();  // 初始加速度为0
+  Eigen::Vector3d j0 = max_jerk * scale_vec;     // 初始Jerk为最大值
+
+  /* 第一段：加速阶段 (Jerk为正，加速度从0增加到max_acc) */
+  cx = cy = cz = zero;
+  double t1 = max_acc / max_jerk;  // 达到最大加速度所需时间
+
+  // 多项式形式: p(t) = c5 + c4*t + c3*t^2 + c2*t^3 + c1*t^4 + c0*t^5
+  cx[5] = p0(0);  // 位置系数
+  cy[5] = p0(1);
+  cz[5] = p0(2);
+
+  cx[4] = v0(0);  // 速度系数
+  cy[4] = v0(1);
+  cz[4] = v0(2);
+
+  cx[3] = (1 / 2.0) * a0(0);  // 加速度系数
+  cy[3] = (1 / 2.0) * a0(1);
+  cz[3] = (1 / 2.0) * a0(2);
+
+  cx[2] = (1 / 6.0) * j0(0);  // Jerk系数
+  cy[2] = (1 / 6.0) * j0(1);
+  cz[2] = (1 / 6.0) * j0(2);
+
+  poly_traj.addSegment(cx, cy, cz, t1);
+
+  // 计算第一段结束时的状态
+  Eigen::Vector3d p1 = p0 + v0 * t1 + (1 / 2.0) * a0 * pow(t1, 2) + (1 / 6.0) * j0 * pow(t1, 3);
+  Eigen::Vector3d v1 = v0 + a0 * t1 + (1 / 2.0) * j0 * pow(t1, 2);
+  Eigen::Vector3d a1 = a0 + j0 * t1;  // 此时加速度达到max_acc
+  Eigen::Vector3d j1 = Eigen::Vector3d::Zero();  // Jerk归零
+
+  /* 第二段：匀加速阶段 (Jerk为0，加速度保持max_acc) */
+  cx = cy = cz = zero;
+  double t2 = max_vel / max_acc - t1;  // 达到最大速度所需的剩余时间
+
+  cx[5] = p1(0);
+  cy[5] = p1(1);
+  cz[5] = p1(2);
+
+  cx[4] = v1(0);
+  cy[4] = v1(1);
+  cz[4] = v1(2);
+
+  cx[3] = (1 / 2.0) * a1(0);
+  cy[3] = (1 / 2.0) * a1(1);
+  cz[3] = (1 / 2.0) * a1(2);
+
+  cx[2] = (1 / 6.0) * j1(0);
+  cy[2] = (1 / 6.0) * j1(1);
+  cz[2] = (1 / 6.0) * j1(2);
+
+  poly_traj.addSegment(cx, cy, cz, t2);
+
+  // 计算第二段结束时的状态
+  Eigen::Vector3d p2 = p1 + v1 * t2 + (1 / 2.0) * a1 * pow(t2, 2) + (1 / 6.0) * j1 * pow(t2, 3);
+  Eigen::Vector3d v2 = v1 + a1 * t2 + (1 / 2.0) * j1 * pow(t2, 2);  // 此时速度达到max_vel
+  Eigen::Vector3d a2 = a1 + j1 * t2;  // 加速度仍为max_acc
+  Eigen::Vector3d j2 = -max_jerk * scale_vec;  // 开始减小加速度
+
+  /* 第三段：减加速阶段 (Jerk为负，加速度从max_acc减小到0) */
+  cx = cy = cz = zero;
+  double t3 = t1;  // 时间与第一段相同
+
+  cx[5] = p2(0);
+  cy[5] = p2(1);
+  cz[5] = p2(2);
+
+  cx[4] = v2(0);
+  cy[4] = v2(1);
+  cz[4] = v2(2);
+
+  cx[3] = (1 / 2.0) * a2(0);
+  cy[3] = (1 / 2.0) * a2(1);
+  cz[3] = (1 / 2.0) * a2(2);
+
+  cx[2] = (1 / 6.0) * j2(0);
+  cy[2] = (1 / 6.0) * j2(1);
+  cz[2] = (1 / 6.0) * j2(2);
+
+  poly_traj.addSegment(cx, cy, cz, t3);
+
+  // 计算第三段结束时的状态
+  Eigen::Vector3d p3 = p2 + v2 * t3 + (1 / 2.0) * a2 * pow(t3, 2) + (1 / 6.0) * j2 * pow(t3, 3);
+  Eigen::Vector3d v3 = v2 + a2 * t3 + (1 / 2.0) * j2 * pow(t3, 2);  // 速度保持max_vel
+  Eigen::Vector3d a3 = a2 + j2 * t3;  // 加速度归零
+  Eigen::Vector3d j3 = Eigen::Vector3d::Zero();  // Jerk归零
+
+  /* 第四段：匀速阶段 (速度保持max_vel，加速度和Jerk都为0) */
+  cx = cy = cz = zero;
+  double t4 = max_dist / max_vel - 2 * t1 - t2;  // 匀速段时间
+
+  cx[5] = p3(0);
+  cy[5] = p3(1);
+  cz[5] = p3(2);
+
+  cx[4] = v3(0);
+  cy[4] = v3(1);
+  cz[4] = v3(2);
+
+  cx[3] = (1 / 2.0) * a3(0);
+  cy[3] = (1 / 2.0) * a3(1);
+  cz[3] = (1 / 2.0) * a3(2);
+
+  cx[2] = (1 / 6.0) * j3(0);
+  cy[2] = (1 / 6.0) * j3(1);
+  cz[2] = (1 / 6.0) * j3(2);
+
+  poly_traj.addSegment(cx, cy, cz, t4);
+
+  // 计算第四段结束时的状态
+  Eigen::Vector3d p4 = p3 + v3 * t4 + (1 / 2.0) * a3 * pow(t4, 2) + (1 / 6.0) * j3 * pow(t4, 3);
+  Eigen::Vector3d v4 = v3 + a3 * t4 + (1 / 2.0) * j3 * pow(t4, 2);  // 速度仍为max_vel
+  Eigen::Vector3d a4 = a3 + j3 * t4;  // 加速度仍为0
+  Eigen::Vector3d j4 = -max_jerk * scale_vec;  // 开始减速，Jerk为负
+
+  /* 第五段：开始减速 (Jerk为负，加速度从0减小到-max_acc) */
+  cx = cy = cz = zero;
+  double t5 = t1;  // 时间与第一段相同
+
+  cx[5] = p4(0);
+  cy[5] = p4(1);
+  cz[5] = p4(2);
+
+  cx[4] = v4(0);
+  cy[4] = v4(1);
+  cz[4] = v4(2);
+
+  cx[3] = (1 / 2.0) * a4(0);
+  cy[3] = (1 / 2.0) * a4(1);
+  cz[3] = (1 / 2.0) * a4(2);
+
+  cx[2] = (1 / 6.0) * j4(0);
+  cy[2] = (1 / 6.0) * j4(1);
+  cz[2] = (1 / 6.0) * j4(2);
+
+  poly_traj.addSegment(cx, cy, cz, t5);
+
+  // 计算第五段结束时的状态
+  Eigen::Vector3d p5 = p4 + v4 * t5 + (1 / 2.0) * a4 * pow(t5, 2) + (1 / 6.0) * j4 * pow(t5, 3);
+  Eigen::Vector3d v5 = v4 + a4 * t5 + (1 / 2.0) * j4 * pow(t5, 2);  // 速度开始下降
+  Eigen::Vector3d a5 = a4 + j4 * t5;  // 加速度达到-max_acc
+  Eigen::Vector3d j5 = Eigen::Vector3d::Zero();  // Jerk归零
+
+  /* 第六段：匀减速阶段 (Jerk为0，加速度保持-max_acc) */
+  cx = cy = cz = zero;
+  double t6 = t2;  // 时间与第二段相同
+
+  cx[5] = p5(0);
+  cy[5] = p5(1);
+  cz[5] = p5(2);
+
+  cx[4] = v5(0);
+  cy[4] = v5(1);
+  cz[4] = v5(2);
+
+  cx[3] = (1 / 2.0) * a5(0);
+  cy[3] = (1 / 2.0) * a5(1);
+  cz[3] = (1 / 2.0) * a5(2);
+
+  cx[2] = (1 / 6.0) * j5(0);
+  cy[2] = (1 / 6.0) * j5(1);
+  cz[2] = (1 / 6.0) * j5(2);
+
+  poly_traj.addSegment(cx, cy, cz, t6);
+
+  // 计算第六段结束时的状态
+  Eigen::Vector3d p6 = p5 + v5 * t6 + (1 / 2.0) * a5 * pow(t6, 2) + (1 / 6.0) * j5 * pow(t6, 3);
+  Eigen::Vector3d v6 = v5 + a5 * t6 + (1 / 2.0) * j5 * pow(t6, 2);  // 速度继续下降
+  Eigen::Vector3d a6 = a5 + j5 * t6;  // 加速度仍为-max_acc
+  Eigen::Vector3d j6 = max_jerk * scale_vec;  // Jerk转为正，准备停止减速
+
+  /* 第七段(最后一段)：减速停止 (Jerk为正，加速度从-max_acc增加到0，速度降到0) */
+  cx = cy = cz = zero;
+  double t7 = t1;  // 时间与第一段相同
+
+  cx[5] = p6(0);
+  cy[5] = p6(1);
+  cz[5] = p6(2);
+
+  cx[4] = v6(0);
+  cy[4] = v6(1);
+  cz[4] = v6(2);
+
+  cx[3] = (1 / 2.0) * a6(0);
+  cy[3] = (1 / 2.0) * a6(1);
+  cz[3] = (1 / 2.0) * a6(2);
+
+  cx[2] = (1 / 6.0) * j6(0);
+  cy[2] = (1 / 6.0) * j6(1);
+  cz[2] = (1 / 6.0) * j6(2);
+
+  poly_traj.addSegment(cx, cy, cz, t7);
+
+  return poly_traj;
+}
+
+/**
+ * @brief 生成快速直线轨迹 (三次多项式，3段式)
+ * @details 生成简化的直线轨迹，满足最大速度和加速度约束
+ *          轨迹分为3段：加速→匀速→减速
+ *          相比7段式轨迹更简单，但可能不够平滑
+ *
+ * @param start 起点位置
+ * @param end 终点位置
+ * @param max_vel 最大速度
+ * @param max_acc 最大加速度
+ * @return PolynomialTraj 生成的多项式轨迹
+ */
+PolynomialTraj fastLine3deg(Eigen::Vector3d start, Eigen::Vector3d end, double max_vel, double max_acc) {
+  Eigen::Vector3d disp = end - start;  // 位移向量
+  double len = disp.norm();            // 位移长度
+  Eigen::Vector3d dir = disp.normalized();  // 单位方向向量
+
+  // 获取缩放向量：找到位移最大的分量
+  double max_dist = std::max(disp(0), disp(1));
+  max_dist = std::max(max_dist, disp(2));
+  Eigen::Vector3d scale_vec = disp / max_dist;  // 缩放向量
+
+  // 计算3段轨迹的时间分配
+  // 头尾段(加速/减速段)的时间
+  double t_ht = max_vel / max_acc;
+
+  // 头尾段的长度
+  double len_ht = 0.5 * (max_acc * scale_vec.norm()) * t_ht * t_ht;
+  // 中间匀速段的时间
+  double t_m = (len - 2 * len_ht) / (max_vel * scale_vec.norm());
+
+  // 计算两个中间路径点(加速结束点和减速开始点)
+  Eigen::Vector3d mpt1 = start + dir * len_ht;  // 加速结束位置
+  Eigen::Vector3d mpt2 = end - dir * len_ht;    // 减速开始位置
+
+  // 构建3段轨迹
+  PolynomialTraj poly_traj;
+  vector<double> cx(6), cy(6), cz(6), zero(6);
+  for (int i = 0; i < 6; ++i)
+    zero[i] = 0.0;
+
+  /* 第一段：加速段 (从静止加速到最大速度) */
+  cx = cy = cz = zero;
+
+  cx[5] = start(0);  // p0 初始位置
+  cy[5] = start(1);
+  cz[5] = start(2);
+
+  cx[4] = 0.0;  // v0 初始速度为0
+  cy[4] = 0.0;
+  cz[4] = 0.0;
+
+  cx[3] = 0.5 * max_acc * scale_vec(0);  // a0 恒定加速度
+  cy[3] = 0.5 * max_acc * scale_vec(1);
+  cz[3] = 0.5 * max_acc * scale_vec(2);
+
+  poly_traj.addSegment(cx, cy, cz, t_ht);
+
+  /* 第二段：匀速段 (保持最大速度) */
+  cx = cy = cz = zero;
+
+  cx[5] = mpt1(0);  // p0 加速结束位置
+  cy[5] = mpt1(1);
+  cz[5] = mpt1(2);
+
+  cx[4] = max_vel * scale_vec(0);  // v0 最大速度
+  cy[4] = max_vel * scale_vec(1);
+  cz[4] = max_vel * scale_vec(2);
+
+  cx[3] = 0.0;  // a0 加速度为0
+  cy[3] = 0.0;
+  cz[3] = 0.0;
+
+  poly_traj.addSegment(cx, cy, cz, t_m);
+
+  /* 第三段：减速段 (从最大速度减速到静止) */
+  cx = cy = cz = zero;
+
+  cx[5] = mpt2(0);  // p0 减速开始位置
+  cy[5] = mpt2(1);
+  cz[5] = mpt2(2);
+
+  cx[4] = max_vel * scale_vec(0);  // v0 最大速度
+  cy[4] = max_vel * scale_vec(1);
+  cz[4] = max_vel * scale_vec(2);
+
+  cx[3] = -0.5 * max_acc * scale_vec(0);  // a0 恒定减速度(负加速度)
+  cy[3] = -0.5 * max_acc * scale_vec(1);
+  cz[3] = -0.5 * max_acc * scale_vec(2);
+
+  poly_traj.addSegment(cx, cy, cz, t_ht);
+
+  return poly_traj;
+}

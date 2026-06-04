@@ -2,12 +2,30 @@ schema: xgc2.product.v1
 id: xgc2-planner
 name: XGC2 Planner
 kind: ros1-apt
-summary: ROS1 planner packages including GCOPTER, MADER, and Robust MADER.
+summary: ROS1 planner packages including GCOPTER, MADER, Robust MADER, EGO-Planner, and Fast-Planner.
 
 ros:
   distro: noetic
   packages:
     - gcopter
+    - bspline
+    - fast_bspline_opt
+    - fast_local_sensing
+    - fast_map_generator
+    - fast_path_searching
+    - fast_plan_env
+    - fast_plan_manage
+    - fast_traj_utils
+    - fast_waypoint_generator
+    - poly_traj
+    - ego_bspline_opt
+    - ego_local_sensing
+    - ego_map_generator
+    - ego_path_searching
+    - ego_plan_env
+    - ego_planner
+    - ego_traj_utils
+    - ego_waypoint_generator
     - mader
     - mader_msgs
     - rmader
@@ -19,6 +37,7 @@ ros:
     - decomp_util
     - eigen_stl_containers
     - graph_msgs
+    - quadrotor_msgs
     - rviz_visual_tools
     - separator
     - snapstack_msgs
@@ -31,15 +50,18 @@ apt:
   packages:
     - ros-noetic-xgc2-planner
     - ros-noetic-xgc2-planner-all
+    - ros-noetic-xgc2-planner-common
     - ros-noetic-xgc2-gcopter
-    - ros-noetic-xgc2-mader-common
     - ros-noetic-xgc2-mader
     - ros-noetic-xgc2-robust-mader
+    - ros-noetic-xgc2-ego-planner
+    - ros-noetic-xgc2-fast-planner
   depends:
     - ros-noetic-xgc2-planner-all
     - ros-noetic-xgc2-mockamap
     - libompl15
     - libnlopt0
+    - ros-noetic-pcl-ros
 
 usage:
   install: |
@@ -49,12 +71,16 @@ usage:
     rospack find gcopter
     rospack find mader
     rospack find rmader
+    rospack find ego_planner
+    rospack find fast_plan_manage
 
 ownership:
   paths:
     - /opt/ros/noetic/share/gcopter
     - /opt/ros/noetic/include/gcopter
     - /opt/ros/noetic/lib/gcopter
+    - /opt/ros/noetic/share/fast_plan_manage
+    - /opt/ros/noetic/share/ego_planner
     - /opt/ros/noetic/share/mader
     - /opt/ros/noetic/lib/mader
     - /opt/ros/noetic/share/rmader
@@ -62,4 +88,5 @@ ownership:
     - /opt/ros/noetic/share/mader_msgs
     - /opt/ros/noetic/share/rmader_msgs
     - /opt/ros/noetic/share/snapstack_msgs
+    - /opt/ros/noetic/share/quadrotor_msgs
     - /opt/ros/noetic/share/decomp_util

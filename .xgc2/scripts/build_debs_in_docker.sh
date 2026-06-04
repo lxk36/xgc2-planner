@@ -88,8 +88,10 @@ docker run --rm \
       ros-noetic-message-generation \
       ros-noetic-message-runtime \
       ros-noetic-nav-msgs \
+      ros-noetic-pcl-ros \
       ros-noetic-roscpp \
       ros-noetic-roslint \
+      ros-noetic-roslib \
       ros-noetic-rospack \
       ros-noetic-rospy \
       ros-noetic-rqt-gui \
@@ -100,6 +102,7 @@ docker run --rm \
       ros-noetic-shape-msgs \
       ros-noetic-std-msgs \
       ros-noetic-std-srvs \
+      ros-noetic-tf \
       ros-noetic-tf2-eigen \
       ros-noetic-tf2-geometry-msgs \
       ros-noetic-tf2-ros \
@@ -119,15 +122,16 @@ docker run --rm \
     mkdir -p /workspace/work/src
 
     copy_common() {
+      rsync -a --delete /workspace/planner/common/ /workspace/work/src/
       rsync -a --delete /workspace/planner/mader_common/ /workspace/work/src/
     }
 
     case "${PLANNER_GROUP}" in
+      common)
+        copy_common
+        ;;
       gcopter)
         rsync -a --delete /workspace/planner/gcopter/ /workspace/work/src/gcopter/
-        ;;
-      mader-common)
-        copy_common
         ;;
       mader)
         copy_common
@@ -136,6 +140,14 @@ docker run --rm \
       robust-mader)
         copy_common
         rsync -a --delete /workspace/planner/rmader/ /workspace/work/src/
+        ;;
+      ego-planner)
+        copy_common
+        rsync -a --delete /workspace/planner/ego_planner/ /workspace/work/src/
+        ;;
+      fast-planner)
+        copy_common
+        rsync -a --delete /workspace/planner/fast_planner/ /workspace/work/src/
         ;;
       *)
         echo "unknown planner group: ${PLANNER_GROUP}" >&2
