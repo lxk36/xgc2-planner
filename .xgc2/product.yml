@@ -1,0 +1,37 @@
+schema: xgc2.product.v1
+id: xgc2-planner
+name: XGC2 Planner
+kind: ros1-apt
+summary: ROS1 planner packages including the GCOPTER trajectory optimizer.
+
+ros:
+  distro: noetic
+  packages:
+    - gcopter
+
+apt:
+  distribution: focal
+  install:
+    - ros-noetic-xgc2-planner
+  packages:
+    - ros-noetic-xgc2-planner
+    - ros-noetic-xgc2-gcopter
+  depends:
+    - ros-noetic-xgc2-gcopter
+    - ros-noetic-xgc2-mockamap
+    - libompl15
+
+usage:
+  install: |
+    sudo apt update
+    sudo apt install ros-noetic-xgc2-planner
+  smoke_test: |
+    rospack find gcopter
+    roslaunch --files gcopter global_planning.launch
+
+ownership:
+  paths:
+    - /opt/ros/noetic/share/gcopter
+    - /opt/ros/noetic/include/gcopter
+    - /opt/ros/noetic/include/misc
+    - /opt/ros/noetic/lib/gcopter
