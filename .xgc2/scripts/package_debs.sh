@@ -93,6 +93,44 @@ copy_ros_package_paths() {
   copy_path "${PREFIX_ROOT}/share/roseus/ros/${ros_pkg}" "${dst_root}"
 }
 
+prune_non_runtime_payload() {
+  local pkg_root="$1"
+
+  # Keep installed headers for downstream builds, but never ship upstream source,
+  # documentation media, or generated visual assets in runtime planner debs.
+  find "${pkg_root}" -type d \
+    \( -name src -o -name test -o -name tests -o -name example -o -name examples -o -name doc -o -name docs \
+       -o -name img -o -name imgs -o -name image -o -name images -o -name demo -o -name demos \) \
+    -prune -exec rm -rf {} +
+
+  find "${pkg_root}" -type f \
+    \( -iname '*.c' -o -iname '*.cc' -o -iname '*.cpp' -o -iname '*.cxx' -o -iname '*.cu' \
+       -o -iname '*.pdf' \
+       -o -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' \
+       -o -iname '*.bmp' -o -iname '*.svg' -o -iname '*.tif' -o -iname '*.tiff' \) \
+    -delete
+}
+
+assert_no_non_runtime_payload() {
+  local pkg_root="$1"
+  local found=""
+
+  found="$(
+    find "${pkg_root}" -type f \
+      \( -iname '*.c' -o -iname '*.cc' -o -iname '*.cpp' -o -iname '*.cxx' -o -iname '*.cu' \
+         -o -iname '*.pdf' \
+         -o -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' \
+         -o -iname '*.bmp' -o -iname '*.svg' -o -iname '*.tif' -o -iname '*.tiff' \) \
+      -print
+  )"
+
+  if [[ -n "${found}" ]]; then
+    echo "non-runtime files found in ${pkg_root}:" >&2
+    echo "${found}" >&2
+    exit 1
+  fi
+}
+
 build_ros_group_deb() {
   local package="$1"
   local depends="$2"
@@ -108,6 +146,8 @@ build_ros_group_deb() {
     copy_ros_package_paths "${ros_pkg}" "${pkg_root}"
   done
 
+  prune_non_runtime_payload "${pkg_root}"
+  assert_no_non_runtime_payload "${pkg_root}"
   write_control "${pkg_root}" "${package}" "${depends}" "${description}"
   fakeroot dpkg-deb --build "${pkg_root}" "${OUTPUT_DIR}/${package}_${VERSION}_${ARCH}.deb" >/dev/null
 }
