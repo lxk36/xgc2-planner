@@ -30,6 +30,7 @@ public:
   ~SolverNlopt();
 
   bool optimize();
+  bool optimize(bool &is_stuck, bool &is_A_star_failed, bool &is_q0_fail);
 
   // setters
   void setMaxRuntimeKappaAndMu(double runtime, double kappa, double mu);

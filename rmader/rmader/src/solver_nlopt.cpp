@@ -1780,8 +1780,20 @@ void *func(void *arg)
 }
 
 bool SolverNlopt::optimize()
+{
+  bool is_stuck = false;
+  bool is_A_star_failed = false;
+  bool is_q0_fail = false;
+  return optimize(is_stuck, is_A_star_failed, is_q0_fail);
+}
+
+bool SolverNlopt::optimize(bool &is_stuck, bool &is_A_star_failed, bool &is_q0_fail)
 
 {
+  is_stuck = false;
+  is_A_star_failed = false;
+  is_q0_fail = false;
+
   // reset some stuff
   traj_solution_.clear();
   best_cost_so_far_ = std::numeric_limits<double>::max();
