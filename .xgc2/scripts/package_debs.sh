@@ -96,8 +96,8 @@ copy_ros_package_paths() {
 prune_non_runtime_payload() {
   local pkg_root="$1"
 
-  # Keep installed headers for downstream builds, but never ship upstream source,
-  # documentation media, or generated visual assets in runtime planner debs.
+  # Keep installed headers and runtime assets for downstream builds and launch
+  # files, but never ship upstream source or documentation/demo payloads.
   find "${pkg_root}" -type d \
     \( -name src -o -name test -o -name tests -o -name example -o -name examples -o -name doc -o -name docs \
        -o -name img -o -name imgs -o -name image -o -name images -o -name demo -o -name demos \) \
@@ -105,9 +105,7 @@ prune_non_runtime_payload() {
 
   find "${pkg_root}" -type f \
     \( -iname '*.c' -o -iname '*.cc' -o -iname '*.cpp' -o -iname '*.cxx' -o -iname '*.cu' \
-       -o -iname '*.pdf' \
-       -o -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' \
-       -o -iname '*.bmp' -o -iname '*.svg' -o -iname '*.tif' -o -iname '*.tiff' \) \
+       -o -iname '*.pdf' \) \
     -delete
 }
 
@@ -118,9 +116,7 @@ assert_no_non_runtime_payload() {
   found="$(
     find "${pkg_root}" -type f \
       \( -iname '*.c' -o -iname '*.cc' -o -iname '*.cpp' -o -iname '*.cxx' -o -iname '*.cu' \
-         -o -iname '*.pdf' \
-         -o -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.gif' \
-         -o -iname '*.bmp' -o -iname '*.svg' -o -iname '*.tif' -o -iname '*.tiff' \) \
+         -o -iname '*.pdf' \) \
       -print
   )"
 
