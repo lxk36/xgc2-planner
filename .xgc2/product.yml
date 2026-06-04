@@ -33,5 +33,4 @@ ownership:
   paths:
     - /opt/ros/noetic/share/gcopter
     - /opt/ros/noetic/include/gcopter
-    - /opt/ros/noetic/include/misc
     - /opt/ros/noetic/lib/gcopter

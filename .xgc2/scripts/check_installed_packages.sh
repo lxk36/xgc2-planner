@@ -13,8 +13,8 @@ dpkg -s libeigen3-dev >/dev/null
 test "$(rospack find gcopter)" = "/opt/ros/${ROS_DISTRO}/share/gcopter"
 test "$(rospack find mockamap)" = "/opt/ros/${ROS_DISTRO}/share/mockamap"
 test -x "/opt/ros/${ROS_DISTRO}/lib/gcopter/global_planning"
-test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/gcopter.hpp"
-test -f "/opt/ros/${ROS_DISTRO}/include/misc/visualizer.hpp"
+test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/gcopter/gcopter.hpp"
+test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/misc/visualizer.hpp"
 test -f "/opt/ros/${ROS_DISTRO}/share/gcopter/launch/global_planning.launch"
 roslaunch --files gcopter global_planning.launch >/dev/null
 

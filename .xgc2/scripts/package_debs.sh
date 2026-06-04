@@ -77,7 +77,6 @@ copy_ros_package_paths() {
 
   copy_path "${PREFIX_ROOT}/share/${ros_pkg}" "${dst_root}"
   copy_path "${PREFIX_ROOT}/include/${ros_pkg}" "${dst_root}"
-  copy_path "${PREFIX_ROOT}/include/misc" "${dst_root}"
   copy_path "${PREFIX_ROOT}/lib/${ros_pkg}" "${dst_root}"
   copy_path "${PREFIX_ROOT}/lib/python3/dist-packages/${ros_pkg}" "${dst_root}"
 }
