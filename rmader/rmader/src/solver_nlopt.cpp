@@ -301,7 +301,9 @@ void SolverNlopt::generateAStarGuess()
   std::vector<Eigen::Vector3d> q;
   std::vector<Eigen::Vector3d> n;
   std::vector<double> d;
-  bool is_feasible = octopusSolver_->run(q, n, d);
+  bool is_stuck = false;
+  bool is_q0_fail = false;
+  bool is_feasible = octopusSolver_->run(q, n, d, is_stuck, is_q0_fail);
 
   num_of_LPs_run_ = octopusSolver_->getNumOfLPsRun();
   // std::cout << "After Running solved, n= " << std::endl;
