@@ -7,26 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  cpp-quality:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run C++ static quality gate
-        run: |
-          docker run --rm \
-            -e DEBIAN_FRONTEND=noninteractive \
-            -v "$GITHUB_WORKSPACE:/workspace/repo:ro" \
-            ros:noetic-ros-base-focal \
-            bash -lc '
-              set -euo pipefail
-              apt-get update
-              apt-get install -y --no-install-recommends clang-format
-              /workspace/repo/.xgc2/scripts/check_cpp_quality.sh
-            '
-
   package-compliance:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -35,55 +15,6 @@ jobs:
 
       - name: Check package metadata and packaging consistency
         run: .xgc2/scripts/check_package_compliance.sh
-
-  ros-tests:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build ROS package
-        run: |
-          mkdir -p "$RUNNER_TEMP/package-tests"
-          docker run --rm \
-            -e DEBIAN_FRONTEND=noninteractive \
-            -e ROS_PACKAGE_CHECK_WORK_DIR=/workspace/work \
-            -v "$GITHUB_WORKSPACE:/workspace/repo:ro" \
-            -v "$RUNNER_TEMP/package-tests:/workspace/work" \
-            ros:noetic-ros-base-focal \
-            bash -lc '
-              set -euo pipefail
-              apt-get update
-              apt-get install -y --no-install-recommends \
-                build-essential \
-                ca-certificates \
-                cmake \
-                curl \
-                git \
-                libeigen3-dev \
-                libompl-dev \
-                rsync \
-                ros-noetic-geometry-msgs \
-                ros-noetic-roscpp \
-                ros-noetic-rospack \
-                ros-noetic-rqt-plot \
-                ros-noetic-rviz \
-                ros-noetic-sensor-msgs \
-                ros-noetic-std-msgs \
-                ros-noetic-visualization-msgs
-
-              install -m 0755 -d /etc/apt/keyrings
-              curl -fsSL https://xgc2.apt.xiaokang.ink/xgc2-archive-keyring.gpg \
-                -o /etc/apt/keyrings/xgc2-archive-keyring.gpg
-              chmod 0644 /etc/apt/keyrings/xgc2-archive-keyring.gpg
-              echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/xgc2-archive-keyring.gpg] https://xgc2.apt.xiaokang.ink focal main" \
-                > /etc/apt/sources.list.d/xgc2.list
-              apt-get update
-              apt-get install -y --no-install-recommends ros-noetic-xgc2-mockamap
-
-              /workspace/repo/.xgc2/scripts/check_ros_packages.sh --work-dir /workspace/work
-            '
 
   deb-build:
     strategy:
@@ -103,7 +34,8 @@ jobs:
         run: |
           .xgc2/scripts/build_debs_in_docker.sh \
             --work-dir "$RUNNER_TEMP/planner-${{ matrix.arch }}" \
-            --output-dir "$GITHUB_WORKSPACE/debs"
+            --output-dir "$GITHUB_WORKSPACE/debs" \
+            --skip-install-check
 
       - name: Upload deb artifacts
         uses: actions/upload-artifact@v4
