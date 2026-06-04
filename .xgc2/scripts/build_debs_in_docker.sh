@@ -75,6 +75,7 @@ docker run --rm \
       libmpfr-dev \
       libnlopt-dev \
       libogre-1.9-dev \
+      libompl-dev \
       libqt5x11extras5-dev \
       pkg-config \
       python3-yaml \
@@ -122,8 +123,8 @@ docker run --rm \
     mkdir -p /workspace/work/src
 
     copy_common() {
-      rsync -a --delete /workspace/planner/common/ /workspace/work/src/
-      rsync -a --delete /workspace/planner/mader_common/ /workspace/work/src/
+      rsync -a /workspace/planner/common/ /workspace/work/src/
+      rsync -a /workspace/planner/mader_common/ /workspace/work/src/
     }
 
     case "${PLANNER_GROUP}" in
@@ -135,19 +136,19 @@ docker run --rm \
         ;;
       mader)
         copy_common
-        rsync -a --delete /workspace/planner/mader/ /workspace/work/src/
+        rsync -a /workspace/planner/mader/ /workspace/work/src/
         ;;
       robust-mader)
         copy_common
-        rsync -a --delete /workspace/planner/rmader/ /workspace/work/src/
+        rsync -a /workspace/planner/rmader/ /workspace/work/src/
         ;;
       ego-planner)
         copy_common
-        rsync -a --delete /workspace/planner/ego_planner/ /workspace/work/src/
+        rsync -a /workspace/planner/ego_planner/ /workspace/work/src/
         ;;
       fast-planner)
         copy_common
-        rsync -a --delete /workspace/planner/fast_planner/ /workspace/work/src/
+        rsync -a /workspace/planner/fast_planner/ /workspace/work/src/
         ;;
       *)
         echo "unknown planner group: ${PLANNER_GROUP}" >&2

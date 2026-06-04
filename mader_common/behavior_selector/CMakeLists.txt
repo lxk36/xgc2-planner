@@ -31,8 +31,15 @@ include_directories(
  ${catkin_INCLUDE_DIRS}
 )
 
-install(PROGRAMS scripts/rqt_pkg
+install(PROGRAMS
+  scripts/behavior_selector_node.py
+  scripts/rqt_pkg.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY
+  src/rqt_pkg
+  DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
 )
 
 install(DIRECTORY
