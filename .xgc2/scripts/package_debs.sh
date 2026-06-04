@@ -165,14 +165,14 @@ case "${PACKAGE_GROUP}" in
   ego-planner)
     build_ros_group_deb \
       "${ego_pkg}" \
-      "${common_pkg} (= ${VERSION}), libeigen3-dev, libnlopt0, ros-noetic-cmake-modules, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-roslib, ros-noetic-rospy, ros-noetic-std-msgs, ros-noetic-tf" \
+      "${common_pkg} (= ${VERSION}), libeigen3-dev, libnlopt-cxx0, libnlopt0, ros-noetic-cmake-modules, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-roslib, ros-noetic-rospy, ros-noetic-std-msgs, ros-noetic-tf" \
       "XGC2 EGO-Planner local trajectory planner for ROS1" \
       ego_bspline_opt ego_local_sensing ego_map_generator ego_path_searching ego_plan_env ego_planner ego_traj_utils ego_waypoint_generator
     ;;
   fast-planner)
     build_ros_group_deb \
       "${fast_pkg}" \
-      "${common_pkg} (= ${VERSION}), libeigen3-dev, libnlopt0, ros-noetic-cmake-modules, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-roslib, ros-noetic-rospy, ros-noetic-std-msgs, ros-noetic-tf" \
+      "${common_pkg} (= ${VERSION}), libeigen3-dev, libnlopt-cxx0, libnlopt0, ros-noetic-cmake-modules, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-roslib, ros-noetic-rospy, ros-noetic-std-msgs, ros-noetic-tf" \
       "XGC2 Fast-Planner local trajectory planner for ROS1" \
       bspline fast_bspline_opt fast_local_sensing fast_map_generator fast_path_searching fast_plan_env fast_plan_manage fast_traj_utils fast_waypoint_generator poly_traj
     ;;

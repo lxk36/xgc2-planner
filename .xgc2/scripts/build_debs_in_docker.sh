@@ -73,6 +73,7 @@ docker run --rm \
       libglpk-dev \
       libgmp-dev \
       libmpfr-dev \
+      libnlopt-cxx-dev \
       libnlopt-dev \
       libogre-1.9-dev \
       libompl-dev \

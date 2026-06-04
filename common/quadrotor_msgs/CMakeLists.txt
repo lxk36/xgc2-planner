@@ -85,14 +85,13 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-#add_dependencies(decode_msgs quadrotor_msgs_generate_messages_cpp)
-#add_dependencies(encode_msgs quadrotor_msgs_generate_messages_cpp)
-
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_library(decode_msgs src/decode_msgs.cpp)
 add_library(encode_msgs src/encode_msgs.cpp)
+add_dependencies(decode_msgs ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(encode_msgs ${PROJECT_NAME}_generate_messages_cpp)
 
 install(TARGETS decode_msgs encode_msgs
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

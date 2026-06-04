@@ -87,6 +87,10 @@ else()
 
 endif()
 
+add_executable(${PROJECT_NAME}_node src/mader_node.cpp src/mader_ros.cpp src/mader.cpp )
+target_link_libraries(${PROJECT_NAME}_node PUBLIC ${catkin_LIBRARIES}  solver utils)  #${CGAL_LIBS}
+add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} )
+
 install(TARGETS ${PROJECT_NAME}_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
@@ -95,11 +99,6 @@ install(DIRECTORY launch param rviz_cfgs rqt_cfgs meshes
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
   USE_SOURCE_PERMISSIONS
 )
-
-
-add_executable(${PROJECT_NAME}_node src/mader_node.cpp src/mader_ros.cpp src/mader.cpp )
-target_link_libraries(${PROJECT_NAME}_node PUBLIC ${catkin_LIBRARIES}  solver utils)  #${CGAL_LIBS}
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} )
 
 add_executable(test_octopus_search src/examples/test_octopus_search.cpp src/octopus_search.cpp src/bspline_utils.cpp) 
 add_dependencies(test_octopus_search ${catkin_EXPORTED_TARGETS} )
