@@ -17,6 +17,14 @@ required_files=(
   "gcopter/package.xml"
   "gcopter/launch/global_planning.launch"
   "gcopter/config/global_planning.yaml"
+  "mader/mader/CMakeLists.txt"
+  "mader/mader/package.xml"
+  "mader/mader_msgs/package.xml"
+  "rmader/rmader/CMakeLists.txt"
+  "rmader/rmader/package.xml"
+  "rmader/rmader_msgs/package.xml"
+  "mader_common/snapstack_msgs/package.xml"
+  "mader_common/decomp_util/package.xml"
 )
 
 for file in "${required_files[@]}"; do
@@ -30,6 +38,8 @@ grep -q "id: xgc2-planner" "${REPO_ROOT}/.xgc2/product.yml"
 grep -q "<name>gcopter</name>" "${REPO_ROOT}/gcopter/package.xml"
 grep -q "find_package(ompl REQUIRED)" "${REPO_ROOT}/gcopter/CMakeLists.txt"
 grep -q "ros-noetic-xgc2-mockamap" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
+grep -q "ros-noetic-xgc2-mader-common" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
+grep -q "ros-noetic-xgc2-robust-mader" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "branches:" "${REPO_ROOT}/.github/workflows/build-debs.yml"
 grep -q "noetic" "${REPO_ROOT}/.github/workflows/build-debs.yml"
 

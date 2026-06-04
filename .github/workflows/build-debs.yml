@@ -17,7 +17,33 @@ jobs:
         run: .xgc2/scripts/check_package_compliance.sh
 
   deb-build:
-    timeout-minutes: 10
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+        planner_group: [gcopter, mader-common, mader, robust-mader]
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build planner deb packages in Docker
+        run: |
+          .xgc2/scripts/build_debs_in_docker.sh \
+            --planner-group "${{ matrix.planner_group }}" \
+            --work-dir "$RUNNER_TEMP/planner-${{ matrix.planner_group }}-${{ matrix.arch }}" \
+            --output-dir "$GITHUB_WORKSPACE/debs" \
+            --skip-install-check
+
+      - name: Upload deb artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: xgc2-planner-${{ matrix.planner_group }}-debs-${{ matrix.arch }}
+          path: debs/*.deb
+
+  meta-build:
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -31,22 +57,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build and install-check deb packages in Docker
+      - name: Build planner metapackages
         run: |
-          .xgc2/scripts/build_debs_in_docker.sh \
-            --work-dir "$RUNNER_TEMP/planner-${{ matrix.arch }}" \
-            --output-dir "$GITHUB_WORKSPACE/debs" \
-            --skip-install-check
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fakeroot
+          mkdir -p debs
+          .xgc2/scripts/package_debs.sh \
+            --package-group meta \
+            --output-dir "$GITHUB_WORKSPACE/debs"
 
-      - name: Upload deb artifacts
+      - name: Upload meta deb artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: xgc2-planner-debs-${{ matrix.arch }}
+          name: xgc2-planner-meta-debs-${{ matrix.arch }}
           path: debs/*.deb
 
   publish-apt:
     runs-on: ubuntu-latest
-    needs: deb-build
+    needs:
+      - deb-build
+      - meta-build
     env:
       APT_REPO_HOST: ${{ secrets.APT_REPO_HOST }}
       APT_REPO_PORT: ${{ secrets.APT_REPO_PORT }}
@@ -58,7 +88,7 @@ jobs:
       - name: Download deb artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: xgc2-planner-debs-*
+          pattern: xgc2-planner-*-debs-*
           path: debs
           merge-multiple: true
 

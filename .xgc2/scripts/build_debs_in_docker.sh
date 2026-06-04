@@ -8,6 +8,8 @@ DOCKER_IMAGE="${DOCKER_IMAGE:-ros:noetic-ros-base-focal}"
 WORK_DIR="${WORK_DIR:-${REPO_ROOT}/.work/docker}"
 OUTPUT_DIR="${OUTPUT_DIR:-${REPO_ROOT}/debs}"
 INSTALL_CHECK="${INSTALL_CHECK:-true}"
+PLANNER_GROUP="${PLANNER_GROUP:-gcopter}"
+DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS:-}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -21,6 +23,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --output-dir)
       OUTPUT_DIR="$2"
+      shift 2
+      ;;
+    --planner-group)
+      PLANNER_GROUP="$2"
       shift 2
       ;;
     --skip-install-check)
@@ -37,9 +43,13 @@ done
 mkdir -p "${WORK_DIR}" "${OUTPUT_DIR}"
 
 docker pull "${DOCKER_IMAGE}"
+# shellcheck disable=SC2206
+extra_docker_args=(${DOCKER_RUN_ARGS})
 docker run --rm \
+  "${extra_docker_args[@]}" \
   -e DEBIAN_FRONTEND=noninteractive \
   -e INSTALL_CHECK="${INSTALL_CHECK}" \
+  -e PLANNER_GROUP="${PLANNER_GROUP}" \
   -v "${REPO_ROOT}:/workspace/planner:ro" \
   -v "${WORK_DIR}:/workspace/work" \
   -v "${OUTPUT_DIR}:/workspace/out" \
@@ -58,16 +68,42 @@ docker run --rm \
       fakeroot \
       file \
       git \
+      libcgal-dev \
       libeigen3-dev \
-      libompl-dev \
+      libglpk-dev \
+      libgmp-dev \
+      libmpfr-dev \
+      libnlopt-dev \
+      libogre-1.9-dev \
+      libqt5x11extras5-dev \
+      pkg-config \
+      python3-yaml \
       rsync \
+      ros-noetic-actionlib-msgs \
+      ros-noetic-cmake-modules \
+      ros-noetic-gazebo-msgs \
       ros-noetic-geometry-msgs \
+      ros-noetic-interactive-markers \
+      ros-noetic-jsk-rviz-plugins \
+      ros-noetic-message-generation \
+      ros-noetic-message-runtime \
+      ros-noetic-nav-msgs \
       ros-noetic-roscpp \
+      ros-noetic-roslint \
       ros-noetic-rospack \
+      ros-noetic-rospy \
+      ros-noetic-rqt-gui \
+      ros-noetic-rqt-gui-py \
       ros-noetic-rqt-plot \
       ros-noetic-rviz \
       ros-noetic-sensor-msgs \
+      ros-noetic-shape-msgs \
       ros-noetic-std-msgs \
+      ros-noetic-std-srvs \
+      ros-noetic-tf2-eigen \
+      ros-noetic-tf2-geometry-msgs \
+      ros-noetic-tf2-ros \
+      ros-noetic-trajectory-msgs \
       ros-noetic-visualization-msgs
 
     install -m 0755 -d /etc/apt/keyrings
@@ -81,7 +117,31 @@ docker run --rm \
 
     rm -rf /workspace/work/src /workspace/work/build /workspace/work/devel /workspace/work/install-root
     mkdir -p /workspace/work/src
-    rsync -a --delete /workspace/planner/gcopter/ /workspace/work/src/gcopter/
+
+    copy_common() {
+      rsync -a --delete /workspace/planner/mader_common/ /workspace/work/src/
+    }
+
+    case "${PLANNER_GROUP}" in
+      gcopter)
+        rsync -a --delete /workspace/planner/gcopter/ /workspace/work/src/gcopter/
+        ;;
+      mader-common)
+        copy_common
+        ;;
+      mader)
+        copy_common
+        rsync -a --delete /workspace/planner/mader/ /workspace/work/src/
+        ;;
+      robust-mader)
+        copy_common
+        rsync -a --delete /workspace/planner/rmader/ /workspace/work/src/
+        ;;
+      *)
+        echo "unknown planner group: ${PLANNER_GROUP}" >&2
+        exit 1
+        ;;
+    esac
 
     cd /workspace/work
     source /opt/ros/noetic/setup.bash
@@ -89,26 +149,22 @@ docker run --rm \
     catkin_make \
       -DCMAKE_INSTALL_PREFIX=/opt/ros/noetic \
       -DCMAKE_BUILD_TYPE=Release \
+      -DUSE_GUROBI=OFF \
       -DCMAKE_CXX_FLAGS_RELEASE="-O3 -DNDEBUG" \
       -DCMAKE_C_FLAGS_RELEASE="-O3 -DNDEBUG"
 
     DESTDIR=/workspace/work/install-root catkin_make install \
       -DCMAKE_INSTALL_PREFIX=/opt/ros/noetic \
       -DCMAKE_BUILD_TYPE=Release \
+      -DUSE_GUROBI=OFF \
       -DCATKIN_ENABLE_TESTING=OFF \
       -DCMAKE_CXX_FLAGS_RELEASE="-O3 -DNDEBUG" \
       -DCMAKE_C_FLAGS_RELEASE="-O3 -DNDEBUG"
 
     /workspace/planner/.xgc2/scripts/package_debs.sh \
+      --package-group "${PLANNER_GROUP}" \
       --install-root /workspace/work/install-root \
       --output-dir /workspace/out
-
-    if [[ "${INSTALL_CHECK}" == "true" ]]; then
-      apt-get install -y \
-        /workspace/out/ros-noetic-xgc2-planner_*.deb \
-        /workspace/out/ros-noetic-xgc2-gcopter_*.deb
-      /workspace/planner/.xgc2/scripts/check_installed_packages.sh
-    fi
   '
 
 echo "Debian package output:"

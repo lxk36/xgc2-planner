@@ -2,12 +2,27 @@ schema: xgc2.product.v1
 id: xgc2-planner
 name: XGC2 Planner
 kind: ros1-apt
-summary: ROS1 planner packages including the GCOPTER trajectory optimizer.
+summary: ROS1 planner packages including GCOPTER, MADER, and Robust MADER.
 
 ros:
   distro: noetic
   packages:
     - gcopter
+    - mader
+    - mader_msgs
+    - rmader
+    - rmader_msgs
+    - behavior_selector
+    - cgal_wrapper
+    - decomp_ros_msgs
+    - decomp_ros_utils
+    - decomp_util
+    - eigen_stl_containers
+    - graph_msgs
+    - rviz_visual_tools
+    - separator
+    - snapstack_msgs
+    - view_controller_msgs
 
 apt:
   distribution: focal
@@ -17,10 +32,14 @@ apt:
     - ros-noetic-xgc2-planner
     - ros-noetic-xgc2-planner-all
     - ros-noetic-xgc2-gcopter
+    - ros-noetic-xgc2-mader-common
+    - ros-noetic-xgc2-mader
+    - ros-noetic-xgc2-robust-mader
   depends:
     - ros-noetic-xgc2-planner-all
     - ros-noetic-xgc2-mockamap
     - libompl15
+    - libnlopt0
 
 usage:
   install: |
@@ -28,9 +47,19 @@ usage:
     sudo apt install ros-noetic-xgc2-planner
   smoke_test: |
     rospack find gcopter
+    rospack find mader
+    rospack find rmader
 
 ownership:
   paths:
     - /opt/ros/noetic/share/gcopter
     - /opt/ros/noetic/include/gcopter
     - /opt/ros/noetic/lib/gcopter
+    - /opt/ros/noetic/share/mader
+    - /opt/ros/noetic/lib/mader
+    - /opt/ros/noetic/share/rmader
+    - /opt/ros/noetic/lib/rmader
+    - /opt/ros/noetic/share/mader_msgs
+    - /opt/ros/noetic/share/rmader_msgs
+    - /opt/ros/noetic/share/snapstack_msgs
+    - /opt/ros/noetic/share/decomp_util
