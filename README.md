@@ -5,6 +5,7 @@ ROS1 Noetic planner package repository for XGC2.
 ## Packages
 
 - `gcopter`: GCOPTER global multicopter trajectory optimizer and demo launch.
+- `jps3d`: JPS3D jump point search and distance-map planner libraries.
 - `mader`: MADER multi-agent trajectory planner.
 - `rmader`: Robust MADER multi-agent trajectory planner.
 - `ego_planner`: EGO-Planner local trajectory planner.
@@ -30,6 +31,7 @@ These commands check package discovery:
 ```bash
 source /opt/ros/noetic/setup.bash
 rospack find gcopter
+rospack find jps3d
 rospack find mader
 rospack find rmader
 rospack find ego_planner

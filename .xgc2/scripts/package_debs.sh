@@ -162,6 +162,7 @@ build_meta_deb() {
 
 common_pkg="ros-noetic-xgc2-planner-common"
 gcopter_pkg="ros-noetic-xgc2-gcopter"
+jps3d_pkg="ros-noetic-xgc2-jps3d"
 mader_pkg="ros-noetic-xgc2-mader"
 rmader_pkg="ros-noetic-xgc2-robust-mader"
 ego_pkg="ros-noetic-xgc2-ego-planner"
@@ -183,6 +184,25 @@ case "${PACKAGE_GROUP}" in
       "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap" \
       "XGC2 GCOPTER trajectory optimizer for ROS1" \
       gcopter
+    ;;
+  jps3d)
+    pkg_root="${BUILD_DIR}/${jps3d_pkg}"
+    rm -rf "${pkg_root}"
+    mkdir -p "${pkg_root}"
+    copy_ros_package_paths "jps3d" "${pkg_root}"
+    copy_path "${PREFIX_ROOT}/include/jps_basis" "${pkg_root}"
+    copy_path "${PREFIX_ROOT}/include/jps_collision" "${pkg_root}"
+    copy_path "${PREFIX_ROOT}/include/jps_planner" "${pkg_root}"
+    copy_path "${PREFIX_ROOT}/lib/libjps_lib.so" "${pkg_root}"
+    copy_path "${PREFIX_ROOT}/lib/libdmp_lib.so" "${pkg_root}"
+    prune_non_runtime_payload "${pkg_root}"
+    assert_no_non_runtime_payload "${pkg_root}"
+    write_control \
+      "${pkg_root}" \
+      "${jps3d_pkg}" \
+      "libboost-dev, libeigen3-dev, libyaml-cpp-dev" \
+      "XGC2 JPS3D jump point search and distance-map planner libraries"
+    fakeroot dpkg-deb --build "${pkg_root}" "${OUTPUT_DIR}/${jps3d_pkg}_${VERSION}_${ARCH}.deb" >/dev/null
     ;;
   mader)
     build_ros_group_deb \
@@ -215,7 +235,7 @@ case "${PACKAGE_GROUP}" in
   meta)
     build_meta_deb \
       "${all_meta_pkg}" \
-      "${common_pkg} (= ${VERSION}), ${gcopter_pkg} (= ${VERSION}), ${mader_pkg} (= ${VERSION}), ${rmader_pkg} (= ${VERSION}), ${ego_pkg} (= ${VERSION}), ${fast_pkg} (= ${VERSION})" \
+      "${common_pkg} (= ${VERSION}), ${gcopter_pkg} (= ${VERSION}), ${jps3d_pkg} (= ${VERSION}), ${mader_pkg} (= ${VERSION}), ${rmader_pkg} (= ${VERSION}), ${ego_pkg} (= ${VERSION}), ${fast_pkg} (= ${VERSION})" \
       "XGC2 ROS1 complete planner package set"
     build_meta_deb \
       "${meta_pkg}" \

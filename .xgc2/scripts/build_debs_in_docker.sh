@@ -69,6 +69,7 @@ docker run --rm \
       file \
       git \
       libcgal-dev \
+      libboost-dev \
       libeigen3-dev \
       libglpk-dev \
       libgmp-dev \
@@ -78,6 +79,7 @@ docker run --rm \
       libogre-1.9-dev \
       libompl-dev \
       libqt5x11extras5-dev \
+      libyaml-cpp-dev \
       pkg-config \
       python3-yaml \
       rsync \
@@ -134,6 +136,9 @@ docker run --rm \
         ;;
       gcopter)
         rsync -a --delete /workspace/planner/gcopter/ /workspace/work/src/gcopter/
+        ;;
+      jps3d)
+        rsync -a --delete /workspace/planner/jps3d/ /workspace/work/src/jps3d/
         ;;
       mader)
         copy_common

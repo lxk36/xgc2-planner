@@ -8,16 +8,20 @@ dpkg -s ros-noetic-xgc2-planner >/dev/null
 dpkg -s ros-noetic-xgc2-planner-all >/dev/null
 dpkg -s ros-noetic-xgc2-planner-common >/dev/null
 dpkg -s ros-noetic-xgc2-gcopter >/dev/null
+dpkg -s ros-noetic-xgc2-jps3d >/dev/null
 dpkg -s ros-noetic-xgc2-mader >/dev/null
 dpkg -s ros-noetic-xgc2-robust-mader >/dev/null
 dpkg -s ros-noetic-xgc2-ego-planner >/dev/null
 dpkg -s ros-noetic-xgc2-fast-planner >/dev/null
 dpkg -s ros-noetic-xgc2-mockamap >/dev/null
+dpkg -s libboost-dev >/dev/null
 dpkg -s libompl15 >/dev/null
 dpkg -s libnlopt0 >/dev/null
 dpkg -s libeigen3-dev >/dev/null
+dpkg -s libyaml-cpp-dev >/dev/null
 
 test "$(rospack find gcopter)" = "/opt/ros/${ROS_DISTRO}/share/gcopter"
+test "$(rospack find jps3d)" = "/opt/ros/${ROS_DISTRO}/share/jps3d"
 test "$(rospack find mader)" = "/opt/ros/${ROS_DISTRO}/share/mader"
 test "$(rospack find rmader)" = "/opt/ros/${ROS_DISTRO}/share/rmader"
 test "$(rospack find mader_msgs)" = "/opt/ros/${ROS_DISTRO}/share/mader_msgs"
@@ -35,6 +39,13 @@ test -x "/opt/ros/${ROS_DISTRO}/lib/fast_plan_manage/fast_planner_node"
 test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/gcopter/gcopter.hpp"
 test -f "/opt/ros/${ROS_DISTRO}/include/gcopter/misc/visualizer.hpp"
 test -f "/opt/ros/${ROS_DISTRO}/share/gcopter/launch/global_planning.launch"
+test -f "/opt/ros/${ROS_DISTRO}/include/jps_basis/data_type.h"
+test -f "/opt/ros/${ROS_DISTRO}/include/jps_collision/map_util.h"
+test -f "/opt/ros/${ROS_DISTRO}/include/jps_planner/jps_planner/jps_planner.h"
+test -f "/opt/ros/${ROS_DISTRO}/include/jps_planner/distance_map_planner/distance_map_planner.h"
+test -f "/opt/ros/${ROS_DISTRO}/lib/libjps_lib.so"
+test -f "/opt/ros/${ROS_DISTRO}/lib/libdmp_lib.so"
+test -f "/opt/ros/${ROS_DISTRO}/share/jps3d/cmake/jps3dConfig.cmake"
 
 while IFS= read -r file; do
   if ! file -b "${file}" | grep -q '^ELF'; then
@@ -45,6 +56,13 @@ while IFS= read -r file; do
     ldd "${file}" >&2 || true
     exit 1
   fi
-done < <(find "/opt/ros/${ROS_DISTRO}/lib/gcopter" -type f 2>/dev/null | sort -u)
+done < <(
+  {
+    find "/opt/ros/${ROS_DISTRO}/lib/gcopter" -type f 2>/dev/null
+    printf '%s\n' \
+      "/opt/ros/${ROS_DISTRO}/lib/libjps_lib.so" \
+      "/opt/ros/${ROS_DISTRO}/lib/libdmp_lib.so"
+  } | sort -u
+)
 
 echo "Installed package check passed"
