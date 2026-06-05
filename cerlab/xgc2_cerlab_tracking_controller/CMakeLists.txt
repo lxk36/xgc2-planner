@@ -192,7 +192,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(DIRECTORY cfg launch rviz
+install(DIRECTORY cfg launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
