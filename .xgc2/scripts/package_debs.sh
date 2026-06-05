@@ -164,6 +164,7 @@ common_pkg="ros-noetic-xgc2-planner-common"
 gcopter_pkg="ros-noetic-xgc2-gcopter"
 jps3d_pkg="ros-noetic-xgc2-jps3d"
 cerlab_pkg="ros-noetic-xgc2-cerlab-planner"
+intent_pkg="ros-noetic-xgc2-intent-mpc"
 mader_pkg="ros-noetic-xgc2-mader"
 rmader_pkg="ros-noetic-xgc2-robust-mader"
 ego_pkg="ros-noetic-xgc2-ego-planner"
@@ -208,9 +209,16 @@ case "${PACKAGE_GROUP}" in
   cerlab-planner)
     build_ros_group_deb \
       "${cerlab_pkg}" \
-      "libeigen3-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-visualization-msgs" \
-      "XGC2 CERLAB RRT planner and UAV tracking controller subset for ROS1" \
-      xgc2_cerlab_map_manager xgc2_cerlab_global_planner xgc2_cerlab_tracking_controller
+      "libeigen3-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-vision-msgs, ros-noetic-visualization-msgs" \
+      "XGC2 CERLAB UAV autonomy planner, mapping, detection, optimization, and control stack for ROS1" \
+      xgc2_cerlab_map_manager xgc2_cerlab_global_planner xgc2_cerlab_onboard_detector xgc2_cerlab_tracking_controller xgc2_cerlab_trajectory_planner xgc2_cerlab_time_optimizer xgc2_cerlab_remote_control xgc2_cerlab_autonomous_flight
+    ;;
+  intent-mpc)
+    build_ros_group_deb \
+      "${intent_pkg}" \
+      "${cerlab_pkg} (= ${VERSION}), libeigen3-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-vision-msgs, ros-noetic-visualization-msgs" \
+      "XGC2 Intent-MPC dynamic prediction and model predictive planning stack for ROS1" \
+      xgc2_intent_mpc_dynamic_predictor xgc2_intent_mpc_trajectory_planner xgc2_intent_mpc_autonomous_flight
     ;;
   mader)
     build_ros_group_deb \
@@ -243,7 +251,7 @@ case "${PACKAGE_GROUP}" in
   meta)
     build_meta_deb \
       "${all_meta_pkg}" \
-      "${common_pkg} (= ${VERSION}), ${gcopter_pkg} (= ${VERSION}), ${jps3d_pkg} (= ${VERSION}), ${cerlab_pkg} (= ${VERSION}), ${mader_pkg} (= ${VERSION}), ${rmader_pkg} (= ${VERSION}), ${ego_pkg} (= ${VERSION}), ${fast_pkg} (= ${VERSION})" \
+      "${common_pkg} (= ${VERSION}), ${gcopter_pkg} (= ${VERSION}), ${jps3d_pkg} (= ${VERSION}), ${cerlab_pkg} (= ${VERSION}), ${intent_pkg} (= ${VERSION}), ${mader_pkg} (= ${VERSION}), ${rmader_pkg} (= ${VERSION}), ${ego_pkg} (= ${VERSION}), ${fast_pkg} (= ${VERSION})" \
       "XGC2 ROS1 complete planner package set"
     build_meta_deb \
       "${meta_pkg}" \

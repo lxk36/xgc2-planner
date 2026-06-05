@@ -1,0 +1,3 @@
+<launch>
+    <node name="rviz1" pkg="rviz" type="rviz" args="-d $(find xgc2_cerlab_remote_control)/rviz/mpc_navigation.rviz" required="true"/>
+</launch>

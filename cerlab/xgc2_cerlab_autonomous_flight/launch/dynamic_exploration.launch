@@ -1,0 +1,14 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_tracking_controller)/cfg/controller_param.yaml" ns="controller"/>
+	<node pkg="xgc2_cerlab_tracking_controller" type="tracking_controller_node" name="tracking_controller_node" output="screen" />
+
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/dynamic_inspection/fake_detector_param.yaml" />
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/dynamic_exploration/flight_base.yaml" ns="xgc2_cerlab_autonomous_flight"/>
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/dynamic_exploration/exploration_param.yaml" ns="DEP"/>
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/dynamic_exploration/planner_param.yaml" />
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/dynamic_exploration/dynamic_detector_param.yaml" ns="/xgc2_cerlab_onboard_detector" />
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/dynamic_exploration/mapping_param.yaml" ns="/dynamic_map" />
+
+	<node pkg="xgc2_cerlab_autonomous_flight" type="throttle_topics.sh" name="throttle_topics" />
+	<node pkg="xgc2_cerlab_autonomous_flight" type="dynamic_exploration_node" name="dynamic_exploration_node" output="screen" />
+</launch>

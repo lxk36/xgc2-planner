@@ -1,0 +1,5 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_map_manager)/cfg/dynamic_map_param.yaml" ns="/dynamic_map"  />
+	<rosparam file="$(find xgc2_cerlab_onboard_detector)/cfg/detector_param.yaml" ns="/xgc2_cerlab_onboard_detector" />
+	<node pkg="xgc2_cerlab_map_manager" type="dynamic_map_node" name="dynamic_map_node" output="screen" />
+</launch>

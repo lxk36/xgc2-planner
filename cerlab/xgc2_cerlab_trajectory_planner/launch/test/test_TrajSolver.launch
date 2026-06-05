@@ -1,0 +1,5 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_trajectory_planner)/src/test/waypoint.yaml" />
+	<node pkg="xgc2_cerlab_trajectory_planner" type="testTrajSolver" name="testTrajSolver" output="screen"/>
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find xgc2_cerlab_trajectory_planner)/rviz/testSolver.rviz"/>
+</launch>

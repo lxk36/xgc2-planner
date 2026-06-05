@@ -344,6 +344,8 @@ namespace mapManager{
 			cout << this->hint_ << ": Not using prebuilt map." << endl;
 		}
 		else{
+			std::string autoFlightPkgPath = ros::package::getPath("xgc2_cerlab_autonomous_flight");
+			this->prebuiltMapDir_ = autoFlightPkgPath + this->prebuiltMapDir_;
 			cout << this->hint_ << ": the prebuilt map absolute dir is found: " << this->prebuiltMapDir_ << endl;
 		}
 

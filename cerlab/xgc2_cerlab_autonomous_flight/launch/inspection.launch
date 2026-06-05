@@ -1,0 +1,4 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_autonomous_flight)/cfg/inspection/inspection_param.yaml" />
+	<node pkg="xgc2_cerlab_autonomous_flight" type="inspection_node" name="inspection_node" output="screen" />
+</launch>

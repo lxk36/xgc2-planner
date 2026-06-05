@@ -1,6 +1,6 @@
 # xgc2_cerlab_global_planner
 
-XGC2-packaged subset of Zhefan Xu's CERLAB `global_planner`.
+XGC2-packaged subset of Zhefan Xu's CERLAB `xgc2_cerlab_global_planner`.
 
 This package keeps the common RRT/RRT* planner code shared by
 `CERLAB-UAV-Autonomy` and `Intent-MPC`, renamed into the XGC2 ROS namespace.

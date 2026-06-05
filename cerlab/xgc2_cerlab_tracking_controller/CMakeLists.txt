@@ -13,18 +13,12 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   geometry_msgs
-  nav_msgs
-  sensor_msgs
-  visualization_msgs
-  tf2_geometry_msgs
   mavros
-  mavros_msgs
   message_generation
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(Eigen3 REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -115,7 +109,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES xgc2_cerlab_tracking_controller
- CATKIN_DEPENDS geometry_msgs mavros mavros_msgs message_runtime nav_msgs roscpp rospy sensor_msgs std_msgs tf2_geometry_msgs visualization_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs mavros message_runtime
 #  DEPENDS system_lib
 )
 
@@ -128,7 +122,6 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -145,8 +138,9 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/tracking_controller_node.cpp)
-add_executable(tracking_controller_node src/tracking_controller_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/xgc2_cerlab_tracking_controller_node.cpp)
+add_executable(xgc2_cerlab_tracking_controller_node src/tracking_controller_node.cpp)
+set_target_properties(xgc2_cerlab_tracking_controller_node PROPERTIES OUTPUT_NAME tracking_controller_node PREFIX "")
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -162,7 +156,7 @@ add_executable(tracking_controller_node src/tracking_controller_node.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(tracking_controller_node ${catkin_LIBRARIES} ${PROJECT_NAME})
+target_link_libraries(xgc2_cerlab_tracking_controller_node ${catkin_LIBRARIES} ${PROJECT_NAME})
 
 #############
 ## Install ##
@@ -180,9 +174,9 @@ target_link_libraries(tracking_controller_node ${catkin_LIBRARIES} ${PROJECT_NAM
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS xgc2_cerlab_tracking_controller_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
@@ -192,17 +186,13 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 
-install(TARGETS tracking_controller_node
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(DIRECTORY cfg launch
+install(DIRECTORY cfg launch rviz
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
@@ -211,7 +201,7 @@ install(DIRECTORY cfg launch
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tracking_controller.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_xgc2_cerlab_tracking_controller.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

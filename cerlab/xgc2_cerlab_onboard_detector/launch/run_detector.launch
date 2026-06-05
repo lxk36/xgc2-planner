@@ -1,0 +1,5 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_onboard_detector)/cfg/detector_param.yaml" ns="/xgc2_cerlab_onboard_detector" />
+	<node pkg="xgc2_cerlab_onboard_detector" type="detector_node" name="detector_node" output="screen" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find xgc2_cerlab_onboard_detector)/rviz/detector.rviz"/>
+</launch>

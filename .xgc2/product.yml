@@ -2,7 +2,7 @@ schema: xgc2.product.v1
 id: xgc2-planner
 name: XGC2 Planner
 kind: ros1-apt
-summary: ROS1 planner packages including GCOPTER, JPS3D, MADER, Robust MADER, EGO-Planner, and Fast-Planner.
+summary: ROS1 planner packages including GCOPTER, JPS3D, CERLAB UAV Autonomy, Intent-MPC, MADER, Robust MADER, EGO-Planner, and Fast-Planner.
 
 ros:
   distro: noetic
@@ -11,7 +11,15 @@ ros:
     - jps3d
     - xgc2_cerlab_map_manager
     - xgc2_cerlab_global_planner
+    - xgc2_cerlab_onboard_detector
     - xgc2_cerlab_tracking_controller
+    - xgc2_cerlab_trajectory_planner
+    - xgc2_cerlab_time_optimizer
+    - xgc2_cerlab_remote_control
+    - xgc2_cerlab_autonomous_flight
+    - xgc2_intent_mpc_dynamic_predictor
+    - xgc2_intent_mpc_trajectory_planner
+    - xgc2_intent_mpc_autonomous_flight
     - bspline
     - fast_bspline_opt
     - fast_local_sensing
@@ -58,6 +66,7 @@ apt:
     - ros-noetic-xgc2-gcopter
     - ros-noetic-xgc2-jps3d
     - ros-noetic-xgc2-cerlab-planner
+    - ros-noetic-xgc2-intent-mpc
     - ros-noetic-xgc2-mader
     - ros-noetic-xgc2-robust-mader
     - ros-noetic-xgc2-ego-planner
@@ -71,6 +80,7 @@ apt:
     - libnlopt0
     - libyaml-cpp-dev
     - ros-noetic-pcl-ros
+    - ros-noetic-vision-msgs
 
 usage:
   install: |
@@ -82,6 +92,9 @@ usage:
     rospack find rmader
     rospack find xgc2_cerlab_global_planner
     rospack find xgc2_cerlab_tracking_controller
+    rospack find xgc2_cerlab_trajectory_planner
+    rospack find xgc2_intent_mpc_trajectory_planner
+    rospack find xgc2_intent_mpc_autonomous_flight
     rospack find ego_planner
     rospack find fast_plan_manage
 
@@ -98,10 +111,25 @@ ownership:
     - /opt/ros/noetic/lib/libdmp_lib.so
     - /opt/ros/noetic/share/xgc2_cerlab_map_manager
     - /opt/ros/noetic/share/xgc2_cerlab_global_planner
+    - /opt/ros/noetic/share/xgc2_cerlab_onboard_detector
     - /opt/ros/noetic/share/xgc2_cerlab_tracking_controller
+    - /opt/ros/noetic/share/xgc2_cerlab_trajectory_planner
+    - /opt/ros/noetic/share/xgc2_cerlab_time_optimizer
+    - /opt/ros/noetic/share/xgc2_cerlab_remote_control
+    - /opt/ros/noetic/share/xgc2_cerlab_autonomous_flight
+    - /opt/ros/noetic/share/xgc2_intent_mpc_dynamic_predictor
+    - /opt/ros/noetic/share/xgc2_intent_mpc_trajectory_planner
+    - /opt/ros/noetic/share/xgc2_intent_mpc_autonomous_flight
     - /opt/ros/noetic/include/xgc2_cerlab_map_manager
     - /opt/ros/noetic/include/xgc2_cerlab_global_planner
+    - /opt/ros/noetic/include/xgc2_cerlab_onboard_detector
     - /opt/ros/noetic/include/xgc2_cerlab_tracking_controller
+    - /opt/ros/noetic/include/xgc2_cerlab_trajectory_planner
+    - /opt/ros/noetic/include/xgc2_cerlab_time_optimizer
+    - /opt/ros/noetic/include/xgc2_cerlab_autonomous_flight
+    - /opt/ros/noetic/include/xgc2_intent_mpc_dynamic_predictor
+    - /opt/ros/noetic/include/xgc2_intent_mpc_trajectory_planner
+    - /opt/ros/noetic/include/xgc2_intent_mpc_autonomous_flight
     - /opt/ros/noetic/share/fast_plan_manage
     - /opt/ros/noetic/share/ego_planner
     - /opt/ros/noetic/share/mader

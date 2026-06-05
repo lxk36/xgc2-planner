@@ -1,0 +1,10 @@
+<launch>
+	<rosparam file="$(find xgc2_intent_mpc_dynamic_predictor)/cfg/predictor_param.yaml" ns="/xgc2_intent_mpc_dynamic_predictor"  />
+	<rosparam file="$(find xgc2_intent_mpc_dynamic_predictor)/cfg/detector_param.yaml" ns="/xgc2_cerlab_onboard_detector" />
+	<rosparam file="$(find xgc2_intent_mpc_dynamic_predictor)/cfg/dynamic_map_param.yaml" ns="/dynamic_map"  />
+	<rosparam file="$(find xgc2_intent_mpc_dynamic_predictor)/cfg/fake_detector_param.yaml" />
+    <!-- <node pkg="xgc2_cerlab_onboard_detector" type="yolo_detector_node.py" name="yolo_detector_node" output="screen" /> -->
+	<!-- <node pkg="xgc2_cerlab_map_manager" type="dynamic_map_node" name="dynamic_map_node" output="screen" /> -->
+	<node pkg="xgc2_intent_mpc_dynamic_predictor" type="xgc2_intent_mpc_dynamic_predictor_fake_node" name="xgc2_intent_mpc_dynamic_predictor_fake_node" output="screen" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find xgc2_intent_mpc_dynamic_predictor)/rviz/predictor.rviz"/>
+</launch>

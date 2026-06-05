@@ -1,0 +1,5 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_onboard_detector)/cfg/fake_detector_param.yaml" />
+	<node pkg="xgc2_cerlab_onboard_detector" type="fake_detector_node" name="fake_detector_node" output="screen" />
+
+</launch>

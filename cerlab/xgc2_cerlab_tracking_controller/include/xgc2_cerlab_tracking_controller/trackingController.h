@@ -37,6 +37,7 @@ namespace controller{
 			ros::Timer visTimer_; // visualization timer
 
 			// parameters
+			bool simulation_ = true;
 			bool bodyRateControl_ = false;
 			bool attitudeControl_ = false;
 			bool accControl_ = true;

@@ -118,6 +118,7 @@ docker run --rm \
       ros-noetic-tf2-geometry-msgs \
       ros-noetic-tf2-ros \
       ros-noetic-trajectory-msgs \
+      ros-noetic-vision-msgs \
       ros-noetic-visualization-msgs
 
     rm -rf /workspace/work/src /workspace/work/build /workspace/work/devel /workspace/work/install-root
@@ -140,6 +141,10 @@ docker run --rm \
         ;;
       cerlab-planner)
         rsync -a /workspace/planner/cerlab/ /workspace/work/src/
+        ;;
+      intent-mpc)
+        rsync -a /workspace/planner/cerlab/ /workspace/work/src/
+        rsync -a /workspace/planner/intent_mpc/ /workspace/work/src/
         ;;
       mader)
         copy_common

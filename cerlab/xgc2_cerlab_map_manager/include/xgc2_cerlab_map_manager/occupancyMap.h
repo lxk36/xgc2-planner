@@ -6,6 +6,7 @@
 #ifndef MAPMANAGER_OCCUPANCYMAP
 #define MAPMANAGER_OCCUPANCYMAP
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <Eigen/Eigen>
 #include <Eigen/StdVector>
 #include <queue>

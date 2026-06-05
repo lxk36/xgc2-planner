@@ -21,6 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
   image_transport
   pcl_conversions
+  xgc2_cerlab_onboard_detector
 )
 
 ## System dependencies are found with CMake's conventions
@@ -117,7 +118,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES xgc2_cerlab_map_manager
- CATKIN_DEPENDS cv_bridge geometry_msgs image_transport message_filters message_runtime nav_msgs pcl_conversions roscpp rospy sensor_msgs std_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs nav_msgs sensor_msgs message_runtime cv_bridge message_filters image_transport pcl_conversions xgc2_cerlab_onboard_detector
  DEPENDS PCL
 )
 
@@ -130,7 +131,6 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
   ${Eigen3_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
 )
@@ -141,7 +141,8 @@ include_directories(
 # )
 add_library(${PROJECT_NAME} include/${PROJECT_NAME}/occupancyMap.cpp
                             include/${PROJECT_NAME}/ESDFMap.cpp
-                            include/${PROJECT_NAME}/raycast.cpp)
+                            include/${PROJECT_NAME}/raycast.cpp
+                            include/${PROJECT_NAME}/dynamicMap.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -151,9 +152,10 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/map_manager_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/xgc2_cerlab_map_manager_node.cpp)
 add_executable(occupancy_map_node src/occupancy_map_node.cpp)
 add_executable(esdf_map_node src/esdf_map_node.cpp)
+add_executable(dynamic_map_node src/dynamic_map_node.cpp)
 add_executable(save_map_node src/save_map_node.cpp)
 
 
@@ -174,6 +176,7 @@ add_executable(save_map_node src/save_map_node.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(occupancy_map_node ${catkin_LIBRARIES} ${PROJECT_NAME})
 target_link_libraries(esdf_map_node ${catkin_LIBRARIES} ${PROJECT_NAME})
+target_link_libraries(dynamic_map_node ${catkin_LIBRARIES} ${PROJECT_NAME})
 target_link_libraries(save_map_node ${catkin_LIBRARIES} ${PROJECT_NAME})
 
 
@@ -205,7 +208,7 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 )
 
-install(TARGETS occupancy_map_node esdf_map_node save_map_node
+install(TARGETS occupancy_map_node esdf_map_node dynamic_map_node save_map_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -216,6 +219,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #   PATTERN ".svn" EXCLUDE
 )
 
+## Mark other files for installation (e.g. launch and bag files, etc.)
 install(DIRECTORY cfg launch rviz
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
@@ -225,7 +229,7 @@ install(DIRECTORY cfg launch rviz
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_map_manager.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_xgc2_cerlab_map_manager.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

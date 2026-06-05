@@ -1,4 +1,4 @@
 <launch>
 	<rosparam file="$(find xgc2_cerlab_tracking_controller)/cfg/controller_param.yaml" ns="controller"/>
-	<node pkg="xgc2_cerlab_tracking_controller" type="tracking_controller_node" name="tracking_controller_node" output="screen" />
+	<node pkg="xgc2_cerlab_tracking_controller" type="xgc2_cerlab_tracking_controller_node" name="xgc2_cerlab_tracking_controller_node" output="screen" />
 </launch>

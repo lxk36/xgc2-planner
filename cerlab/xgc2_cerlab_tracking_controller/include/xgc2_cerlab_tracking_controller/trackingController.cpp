@@ -15,6 +15,16 @@ namespace controller{
 
 	void trackingController::initParam(){
 		// body rate control
+		if (not this->nh_.getParam("xgc2_cerlab_autonomous_flight/simulation", this->simulation_)){
+			this->simulation_ = true;
+			cout << "[trackingController]: No simulation option param. Use default: true." << endl;
+		}
+		else{
+			cout << "[trackingController]: Simulation option is set to (0: px4/1: sim): " << this->simulation_  << endl;
+		}	
+
+
+		// body rate control
 		if (not this->nh_.getParam("controller/body_rate_control", this->bodyRateControl_)){
 			this->bodyRateControl_ = true;
 			cout << "[trackingController]: No body rate control param. Use default: acceleration control." << endl;
@@ -166,7 +176,12 @@ namespace controller{
 		this->cmdPub_ = this->nh_.advertise<mavros_msgs::AttitudeTarget>("/mavros/setpoint_raw/attitude", 100);
 
 		// acc comman publisher
-		this->accCmdPub_ = this->nh_.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 100);
+		if (this->simulation_){
+			this->accCmdPub_ = this->nh_.advertise<mavros_msgs::PositionTarget>("/CERLAB/quadcopter/cmd_acc", 100);
+		}
+		else{
+			this->accCmdPub_ = this->nh_.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 100);
+		}
 		
 		// current pose visualization publisher
 		this->poseVisPub_ = this->nh_.advertise<geometry_msgs::PoseStamped>("/xgc2_cerlab_tracking_controller/robot_pose", 1);
@@ -187,13 +202,18 @@ namespace controller{
 
 	void trackingController::registerCallback(){
 		// odom subscriber
-		this->odomSub_ = this->nh_.subscribe("/mavros/local_position/odom", 1, &trackingController::odomCB, this);
+		if (this->simulation_){
+			this->odomSub_ = this->nh_.subscribe("/CERLAB/quadcopter/odom", 1, &trackingController::odomCB, this);
+		}
+		else{
+			this->odomSub_ = this->nh_.subscribe("/mavros/local_position/odom", 1, &trackingController::odomCB, this);
+		}
 
 		// imu subscriber
 		this->imuSub_ = this->nh_.subscribe("/mavros/imu/data", 1, &trackingController::imuCB, this);
 	
 		// target setpoint subscriber
-		this->targetSub_ = this->nh_.subscribe("/autonomous_flight/target_state", 1, &trackingController::targetCB, this);
+		this->targetSub_ = this->nh_.subscribe("/xgc2_cerlab_autonomous_flight/target_state", 1, &trackingController::targetCB, this);
 	
 		// controller publisher timer
 		this->cmdTimer_ = this->nh_.createTimer(ros::Duration(0.01), &trackingController::cmdCB, this);
