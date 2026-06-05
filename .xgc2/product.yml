@@ -9,6 +9,9 @@ ros:
   packages:
     - gcopter
     - jps3d
+    - xgc2_cerlab_map_manager
+    - xgc2_cerlab_global_planner
+    - xgc2_cerlab_tracking_controller
     - bspline
     - fast_bspline_opt
     - fast_local_sensing
@@ -54,6 +57,7 @@ apt:
     - ros-noetic-xgc2-planner-common
     - ros-noetic-xgc2-gcopter
     - ros-noetic-xgc2-jps3d
+    - ros-noetic-xgc2-cerlab-planner
     - ros-noetic-xgc2-mader
     - ros-noetic-xgc2-robust-mader
     - ros-noetic-xgc2-ego-planner
@@ -76,6 +80,8 @@ usage:
     rospack find gcopter
     rospack find mader
     rospack find rmader
+    rospack find xgc2_cerlab_global_planner
+    rospack find xgc2_cerlab_tracking_controller
     rospack find ego_planner
     rospack find fast_plan_manage
 
@@ -90,6 +96,12 @@ ownership:
     - /opt/ros/noetic/include/jps_planner
     - /opt/ros/noetic/lib/libjps_lib.so
     - /opt/ros/noetic/lib/libdmp_lib.so
+    - /opt/ros/noetic/share/xgc2_cerlab_map_manager
+    - /opt/ros/noetic/share/xgc2_cerlab_global_planner
+    - /opt/ros/noetic/share/xgc2_cerlab_tracking_controller
+    - /opt/ros/noetic/include/xgc2_cerlab_map_manager
+    - /opt/ros/noetic/include/xgc2_cerlab_global_planner
+    - /opt/ros/noetic/include/xgc2_cerlab_tracking_controller
     - /opt/ros/noetic/share/fast_plan_manage
     - /opt/ros/noetic/share/ego_planner
     - /opt/ros/noetic/share/mader

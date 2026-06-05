@@ -9,6 +9,7 @@ dpkg -s ros-noetic-xgc2-planner-all >/dev/null
 dpkg -s ros-noetic-xgc2-planner-common >/dev/null
 dpkg -s ros-noetic-xgc2-gcopter >/dev/null
 dpkg -s ros-noetic-xgc2-jps3d >/dev/null
+dpkg -s ros-noetic-xgc2-cerlab-planner >/dev/null
 dpkg -s ros-noetic-xgc2-mader >/dev/null
 dpkg -s ros-noetic-xgc2-robust-mader >/dev/null
 dpkg -s ros-noetic-xgc2-ego-planner >/dev/null
@@ -22,6 +23,9 @@ dpkg -s libyaml-cpp-dev >/dev/null
 
 test "$(rospack find gcopter)" = "/opt/ros/${ROS_DISTRO}/share/gcopter"
 test "$(rospack find jps3d)" = "/opt/ros/${ROS_DISTRO}/share/jps3d"
+test "$(rospack find xgc2_cerlab_map_manager)" = "/opt/ros/${ROS_DISTRO}/share/xgc2_cerlab_map_manager"
+test "$(rospack find xgc2_cerlab_global_planner)" = "/opt/ros/${ROS_DISTRO}/share/xgc2_cerlab_global_planner"
+test "$(rospack find xgc2_cerlab_tracking_controller)" = "/opt/ros/${ROS_DISTRO}/share/xgc2_cerlab_tracking_controller"
 test "$(rospack find mader)" = "/opt/ros/${ROS_DISTRO}/share/mader"
 test "$(rospack find rmader)" = "/opt/ros/${ROS_DISTRO}/share/rmader"
 test "$(rospack find mader_msgs)" = "/opt/ros/${ROS_DISTRO}/share/mader_msgs"
@@ -32,6 +36,10 @@ test "$(rospack find ego_planner)" = "/opt/ros/${ROS_DISTRO}/share/ego_planner"
 test "$(rospack find fast_plan_manage)" = "/opt/ros/${ROS_DISTRO}/share/fast_plan_manage"
 test "$(rospack find mockamap)" = "/opt/ros/${ROS_DISTRO}/share/mockamap"
 test -x "/opt/ros/${ROS_DISTRO}/lib/gcopter/global_planning"
+test -x "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_global_planner/rrt_interactive_node"
+test -x "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_global_planner/rrt_star_interactive_node"
+test -x "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_map_manager/occupancy_map_node"
+test -x "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_tracking_controller/tracking_controller_node"
 test -x "/opt/ros/${ROS_DISTRO}/lib/mader/mader_node"
 test -x "/opt/ros/${ROS_DISTRO}/lib/rmader/rmader_node"
 test -x "/opt/ros/${ROS_DISTRO}/lib/ego_planner/ego_planner_node"
@@ -46,6 +54,10 @@ test -f "/opt/ros/${ROS_DISTRO}/include/jps_planner/distance_map_planner/distanc
 test -f "/opt/ros/${ROS_DISTRO}/lib/libjps_lib.so"
 test -f "/opt/ros/${ROS_DISTRO}/lib/libdmp_lib.so"
 test -f "/opt/ros/${ROS_DISTRO}/share/jps3d/cmake/jps3dConfig.cmake"
+test -f "/opt/ros/${ROS_DISTRO}/include/xgc2_cerlab_global_planner/rrtOctomap.h"
+test -f "/opt/ros/${ROS_DISTRO}/include/xgc2_cerlab_map_manager/occupancyMap.h"
+test -f "/opt/ros/${ROS_DISTRO}/include/xgc2_cerlab_tracking_controller/trackingController.h"
+test -f "/opt/ros/${ROS_DISTRO}/share/xgc2_cerlab_global_planner/launch/rrt_interactive.launch"
 
 while IFS= read -r file; do
   if ! file -b "${file}" | grep -q '^ELF'; then
@@ -59,6 +71,9 @@ while IFS= read -r file; do
 done < <(
   {
     find "/opt/ros/${ROS_DISTRO}/lib/gcopter" -type f 2>/dev/null
+    find "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_global_planner" -type f 2>/dev/null
+    find "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_map_manager" -type f 2>/dev/null
+    find "/opt/ros/${ROS_DISTRO}/lib/xgc2_cerlab_tracking_controller" -type f 2>/dev/null
     printf '%s\n' \
       "/opt/ros/${ROS_DISTRO}/lib/libjps_lib.so" \
       "/opt/ros/${ROS_DISTRO}/lib/libdmp_lib.so"

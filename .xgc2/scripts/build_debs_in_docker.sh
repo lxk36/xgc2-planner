@@ -85,13 +85,20 @@ docker run --rm \
       rsync \
       ros-noetic-actionlib-msgs \
       ros-noetic-cmake-modules \
+      ros-noetic-cv-bridge \
       ros-noetic-gazebo-msgs \
       ros-noetic-geometry-msgs \
+      ros-noetic-image-transport \
       ros-noetic-interactive-markers \
       ros-noetic-jsk-rviz-plugins \
+      ros-noetic-mavros \
+      ros-noetic-mavros-msgs \
+      ros-noetic-message-filters \
       ros-noetic-message-generation \
       ros-noetic-message-runtime \
       ros-noetic-nav-msgs \
+      ros-noetic-octomap-ros \
+      ros-noetic-pcl-conversions \
       ros-noetic-pcl-ros \
       ros-noetic-roscpp \
       ros-noetic-roslint \
@@ -139,6 +146,9 @@ docker run --rm \
         ;;
       jps3d)
         rsync -a --delete /workspace/planner/jps3d/ /workspace/work/src/jps3d/
+        ;;
+      cerlab-planner)
+        rsync -a /workspace/planner/cerlab/ /workspace/work/src/
         ;;
       mader)
         copy_common

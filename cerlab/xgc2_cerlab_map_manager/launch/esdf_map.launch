@@ -1,0 +1,4 @@
+<launch>
+	<rosparam file="$(find xgc2_cerlab_map_manager)/cfg/esdf_map_param.yaml" ns="/esdf_map"  />
+	<node pkg="xgc2_cerlab_map_manager" type="esdf_map_node" name="esdf_map_node" output="screen" />
+</launch>
