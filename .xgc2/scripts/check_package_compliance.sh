@@ -44,6 +44,14 @@ required_files=(
   "rmader/rmader_msgs/package.xml"
   "mader_common/snapstack_msgs/package.xml"
   "mader_common/decomp_util/package.xml"
+  "mpc_planner/package.xml"
+  "mpc_planner/CATKIN_IGNORE"
+  "mpc_planner_solver/package.xml"
+  "mpc_planner_solver/CATKIN_IGNORE"
+  "mpc_planner_modules/package.xml"
+  "mpc_planner_modules/CATKIN_IGNORE"
+  "mpc_planner_jackalsimulator/package.xml"
+  "mpc_planner_jackalsimulator/CATKIN_IGNORE"
 )
 
 for file in "${required_files[@]}"; do
@@ -69,6 +77,7 @@ grep -q "ros-noetic-xgc2-intent-mpc" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh
 grep -q "ros-noetic-xgc2-robust-mader" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-ego-planner" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-fast-planner" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
+grep -q "PACKAGE_VERSION:-1.0.0-2" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "branches:" "${REPO_ROOT}/.github/workflows/build-debs.yml"
 grep -q "noetic" "${REPO_ROOT}/.github/workflows/build-debs.yml"
 

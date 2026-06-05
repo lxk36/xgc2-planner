@@ -10,6 +10,7 @@ ROS1 Noetic planner package repository for XGC2.
 - `rmader`: Robust MADER multi-agent trajectory planner.
 - `ego_planner`: EGO-Planner local trajectory planner.
 - `fast_plan_manage`: Fast-Planner local trajectory planner.
+- `mpc_planner*`: imported `tud-amr/mpc_planner` source, currently parked with `CATKIN_IGNORE` until solver generation and dependencies are packaged.
 - `ros-noetic-xgc2-planner-common`: shared support packages used by planner stacks.
 - `ros-noetic-xgc2-planner-all`: metapackage for all planner packages.
 - `ros-noetic-xgc2-planner`: default metapackage that depends on `planner-all`.
@@ -44,3 +45,22 @@ To run the demo:
 source /opt/ros/noetic/setup.bash
 roslaunch gcopter global_planning.launch
 ```
+
+## Imported Candidates
+
+`tud-amr/mpc_planner` has been imported as source packages only. It is not in
+the default catkin build or APT package set yet because the upstream solver
+generation output is not present in-tree:
+
+- `mpc_planner_solver/solver.cmake`
+- `mpc_planner_solver/mpc_planner_solver-extras.cmake`
+- generated Acados/FORCES solver source and headers
+- `mpc_planner_modules/modules.cmake`
+
+The intended XGC2 path is Acados-only generation before catkin build. FORCES Pro
+should not be required for public CI or APT publication.
+
+`tkkim-robot/safe_control` was evaluated as a safety-filter candidate, but the
+upstream repository currently has no license file. Its source is therefore not
+redistributed in this public product until explicit redistribution permission is
+available.
