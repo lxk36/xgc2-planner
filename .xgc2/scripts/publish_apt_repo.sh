@@ -47,6 +47,8 @@ chmod 0600 "${key_file}" "${known_hosts_file}"
 ssh_args=(
   -i "${key_file}"
   -p "${APT_REPO_PORT}"
+  -o BatchMode=yes
+  -o ConnectTimeout=15
   -o IdentitiesOnly=yes
   -o StrictHostKeyChecking=yes
   -o "UserKnownHostsFile=${known_hosts_file}"
