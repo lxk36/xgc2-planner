@@ -23,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Eigen3 REQUIRED)
+find_package(OpenCV REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -126,6 +127,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -133,6 +135,7 @@ include_directories(
 #   src/${PROJECT_NAME}/xgc2_cerlab_global_planner.cpp
 # )
 add_library(${PROJECT_NAME} src/globalPlannerLib.cpp
+                            src/dep.cpp
                             include/${PROJECT_NAME}/PRMKDTree.cpp)
 
 
@@ -167,7 +170,7 @@ add_executable(rrt_star_interactive_node src/rrt_star_interactive_node.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
 # target_link_libraries(test_kdtree ${catkin_LIBRARIES})
 # target_link_libraries(test_prm_kdtree ${catkin_LIBRARIES} ${PROJECT_NAME} ${OpenCV_LIBS})
 # target_link_libraries(test_blob_detection ${catkin_LIBRARIES})

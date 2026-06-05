@@ -209,14 +209,14 @@ case "${PACKAGE_GROUP}" in
   cerlab-planner)
     build_ros_group_deb \
       "${cerlab_pkg}" \
-      "libeigen3-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-vision-msgs, ros-noetic-visualization-msgs" \
+      "libeigen3-dev, libopencv-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-vision-msgs, ros-noetic-visualization-msgs" \
       "XGC2 CERLAB UAV autonomy planner, mapping, detection, optimization, and control stack for ROS1" \
       xgc2_cerlab_map_manager xgc2_cerlab_global_planner xgc2_cerlab_onboard_detector xgc2_cerlab_tracking_controller xgc2_cerlab_trajectory_planner xgc2_cerlab_time_optimizer xgc2_cerlab_remote_control xgc2_cerlab_autonomous_flight
     ;;
   intent-mpc)
     build_ros_group_deb \
       "${intent_pkg}" \
-      "${cerlab_pkg} (= ${VERSION}), libeigen3-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-vision-msgs, ros-noetic-visualization-msgs" \
+      "${cerlab_pkg} (= ${VERSION}), libeigen3-dev, libopencv-dev, libpcl-dev, ros-noetic-cv-bridge, ros-noetic-geometry-msgs, ros-noetic-image-transport, ros-noetic-mavros, ros-noetic-mavros-msgs, ros-noetic-message-filters, ros-noetic-message-runtime, ros-noetic-nav-msgs, ros-noetic-octomap-ros, ros-noetic-pcl-conversions, ros-noetic-pcl-ros, ros-noetic-roscpp, ros-noetic-rospy, ros-noetic-sensor-msgs, ros-noetic-std-msgs, ros-noetic-tf2-geometry-msgs, ros-noetic-vision-msgs, ros-noetic-visualization-msgs" \
       "XGC2 Intent-MPC dynamic prediction and model predictive planning stack for ROS1" \
       xgc2_intent_mpc_dynamic_predictor xgc2_intent_mpc_trajectory_planner xgc2_intent_mpc_autonomous_flight
     ;;

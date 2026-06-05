@@ -209,34 +209,25 @@ add_executable(mpc_node src/mpc_node.cpp)
 # target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} "${CMAKE_CURRENT_SOURCE_DIR}/include/xgc2_intent_mpc_trajectory_planner/third_party/libosqp.a" "${CMAKE_CURRENT_SOURCE_DIR}/include/xgc2_intent_mpc_trajectory_planner/third_party/libOsqpEigen.so.0.7.0")
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
   message("Detected x86_64 architecture.")
-  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/x86/libosqp.so ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/x86/libOsqpEigen.so.0.7.0 ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so)
+  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/x86/libosqp.so ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/x86/libOsqpEigen.so.0.7.0)
   set(TRAJECTORY_PLANNER_THIRD_PARTY_LIBS
     ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/x86/libosqp.so
     ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/x86/libOsqpEigen.so.0.7.0
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so.1
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so.1.2.2beta
   )
   # target_link_libraries(test_time_optimizer ${PROJECT_NAME})
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
   message("Detected ARM architecture.")
-  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libosqp.so ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libOsqpEigen.so.0.8.0 ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so)
+  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libosqp.so ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libOsqpEigen.so.0.8.0)
   set(TRAJECTORY_PLANNER_THIRD_PARTY_LIBS
     ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libosqp.so
     ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libOsqpEigen.so.0.8.0
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so.1
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so.1.2.2beta
   )
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
   message("Detected ARM64 architecture.")
-  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libosqp.so ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libOsqpEigen.so.0.8.0 ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so)
+  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libosqp.so ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libOsqpEigen.so.0.8.0)
   set(TRAJECTORY_PLANNER_THIRD_PARTY_LIBS
     ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libosqp.so
     ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/lib/ARM/libOsqpEigen.so.0.8.0
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so.1
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so.1.2.2beta
   )
 else()
     message("Unknown architecture: ${CMAKE_SYSTEM_PROCESSOR}")
@@ -250,7 +241,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
 # target_link_libraries(testBsplineFit ${catkin_LIBRARIES} ${PROJECT_NAME})
 target_link_libraries(mpc_node ${catkin_LIBRARIES} ${PROJECT_NAME})
 # target_link_libraries(testObstacleClustering ${catkin_LIBRARIES} ${PROJECT_NAME})
-# target_link_libraries(mpc_solver_setup ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/third_party/ACADO/libacado_toolkit_s.so)
 
 #############
 ## Install ##

@@ -78,6 +78,7 @@ docker run --rm \
       libnlopt-dev \
       libogre-1.9-dev \
       libompl-dev \
+      libopencv-dev \
       libqt5x11extras5-dev \
       libyaml-cpp-dev \
       pkg-config \
