@@ -5,7 +5,7 @@ INSTALL_ROOT=""
 OUTPUT_DIR=""
 PACKAGE_GROUP="gcopter"
 ROS_DISTRO="${ROS_DISTRO:-noetic}"
-VERSION="${PACKAGE_VERSION:-1.0.0-2}"
+VERSION="${PACKAGE_VERSION:-1.1.0-1}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -183,7 +183,7 @@ case "${PACKAGE_GROUP}" in
   gcopter)
     build_ros_group_deb \
       "${gcopter_pkg}" \
-      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap" \
+      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap (>= 1.1.4-1)" \
       "XGC2 GCOPTER trajectory optimizer for ROS1" \
       gcopter
     ;;

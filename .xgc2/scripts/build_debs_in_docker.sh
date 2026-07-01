@@ -10,6 +10,7 @@ OUTPUT_DIR="${OUTPUT_DIR:-${REPO_ROOT}/debs}"
 INSTALL_CHECK="${INSTALL_CHECK:-true}"
 PLANNER_GROUP="${PLANNER_GROUP:-gcopter}"
 DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS:-}"
+PACKAGE_VERSION="${PACKAGE_VERSION:-1.1.0-1}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -50,6 +51,7 @@ docker run --rm \
   -e DEBIAN_FRONTEND=noninteractive \
   -e INSTALL_CHECK="${INSTALL_CHECK}" \
   -e PLANNER_GROUP="${PLANNER_GROUP}" \
+  -e PACKAGE_VERSION="${PACKAGE_VERSION}" \
   -v "${REPO_ROOT}:/workspace/planner:ro" \
   -v "${WORK_DIR}:/workspace/work" \
   -v "${OUTPUT_DIR}:/workspace/out" \
