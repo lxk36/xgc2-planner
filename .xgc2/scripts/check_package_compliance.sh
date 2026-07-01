@@ -78,7 +78,7 @@ grep -q "ros-noetic-xgc2-intent-mpc" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh
 grep -q "ros-noetic-xgc2-robust-mader" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-ego-planner" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-fast-planner" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
-grep -q "PACKAGE_VERSION:-1.1.0-1" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
+grep -Fq 'PACKAGE_VERSION:-$(product_version)' "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-mockamap (>= 1.1.4-1)" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "branches:" "${REPO_ROOT}/.github/workflows/ci.yml"
 grep -q "noetic" "${REPO_ROOT}/.github/workflows/ci.yml"
