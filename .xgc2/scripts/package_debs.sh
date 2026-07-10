@@ -195,7 +195,7 @@ case "${PACKAGE_GROUP}" in
   gcopter)
     build_ros_group_deb \
       "${gcopter_pkg}" \
-      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap (>= 1.1.4-1)" \
+      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap (>= 1.1.4-8)" \
       "XGC2 GCOPTER trajectory optimizer for ROS1" \
       gcopter
     ;;
