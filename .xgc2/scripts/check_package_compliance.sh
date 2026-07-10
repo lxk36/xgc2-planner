@@ -10,7 +10,6 @@ required_files=(
   ".xgc2/scripts/check_package_compliance.sh"
   ".xgc2/scripts/check_ros_packages.sh"
   ".xgc2/scripts/package_debs.sh"
-  ".xgc2/scripts/publish_apt_repo.sh"
   ".github/workflows/ci.yml"
   ".github/workflows/release.yml"
   "README.md"

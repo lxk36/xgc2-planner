@@ -56,6 +56,7 @@ docker pull "${DOCKER_IMAGE}"
 # shellcheck disable=SC2206
 extra_docker_args=(${DOCKER_RUN_ARGS})
 docker run --rm \
+  -e XGC2_APT_OVERLAY_URL="${XGC2_APT_OVERLAY_URL:-}" \
   "${extra_docker_args[@]}" \
   -e DEBIAN_FRONTEND=noninteractive \
   -e INSTALL_CHECK="${INSTALL_CHECK}" \

@@ -65,7 +65,7 @@ jobs:
           product_version="$(sed -nE 's|^version:[[:space:]]*([^[:space:]#]+).*|\1|p' .xgc2/product.yml | head -n1)"
           python3 .xgc2/scripts/xgc2_artifact_manifest.py build \
             --deb-dir debs \
-            --output-dir build-manifests \
+            --output-dir .ci/build-manifests \
             --product xgc2-planner \
             --product-version "$product_version" \
             --distribution focal \
@@ -74,8 +74,8 @@ jobs:
             --ci-run-id "$GITHUB_RUN_ID" \
             --ci-workflow "$GITHUB_WORKFLOW" \
             --ci-workflow-ref "$GITHUB_WORKFLOW_REF"
-          mv "build-manifests/xgc2-planner_focal_${{ matrix.arch }}.build.json" \
-            "build-manifests/xgc2-planner_${{ matrix.planner_group }}_focal_${{ matrix.arch }}.build.json"
+          mv ".ci/build-manifests/xgc2-planner_focal_${{ matrix.arch }}.build.json" \
+            ".ci/build-manifests/xgc2-planner_${{ matrix.planner_group }}_focal_${{ matrix.arch }}.build.json"
 
       - name: Upload deb artifacts
         uses: actions/upload-artifact@v4
@@ -83,7 +83,7 @@ jobs:
           name: xgc2-planner-${{ matrix.planner_group }}-debs-${{ matrix.arch }}
           path: |
             debs/*.deb
-            build-manifests/*.json
+            .ci/build-manifests/*.json
           retention-days: 14
           include-hidden-files: true
 
@@ -118,7 +118,7 @@ jobs:
           product_version="$(sed -nE 's|^version:[[:space:]]*([^[:space:]#]+).*|\1|p' .xgc2/product.yml | head -n1)"
           python3 .xgc2/scripts/xgc2_artifact_manifest.py build \
             --deb-dir debs \
-            --output-dir build-manifests \
+            --output-dir .ci/build-manifests \
             --product xgc2-planner \
             --product-version "$product_version" \
             --distribution focal \
@@ -127,8 +127,8 @@ jobs:
             --ci-run-id "$GITHUB_RUN_ID" \
             --ci-workflow "$GITHUB_WORKFLOW" \
             --ci-workflow-ref "$GITHUB_WORKFLOW_REF"
-          mv "build-manifests/xgc2-planner_focal_${{ matrix.arch }}.build.json" \
-            "build-manifests/xgc2-planner_meta_focal_${{ matrix.arch }}.build.json"
+          mv ".ci/build-manifests/xgc2-planner_focal_${{ matrix.arch }}.build.json" \
+            ".ci/build-manifests/xgc2-planner_meta_focal_${{ matrix.arch }}.build.json"
 
       - name: Upload meta deb artifacts
         uses: actions/upload-artifact@v4
@@ -136,6 +136,6 @@ jobs:
           name: xgc2-planner-meta-debs-${{ matrix.arch }}
           path: |
             debs/*.deb
-            build-manifests/*.json
+            .ci/build-manifests/*.json
           retention-days: 14
           include-hidden-files: true
