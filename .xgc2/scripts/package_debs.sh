@@ -281,7 +281,7 @@ case "${PACKAGE_GROUP}" in
       "XGC2 ROS1 complete planner package set"
     build_meta_deb \
       "${meta_pkg}" \
-      "${all_meta_pkg} (>= 1.1.0-10)" \
+      "${all_meta_pkg} (>= 1.1.0-11)" \
       "XGC2 ROS1 default planner metapackage"
     ;;
   *)
