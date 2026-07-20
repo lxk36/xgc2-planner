@@ -73,7 +73,6 @@ apt:
   - ros-noetic-xgc2-fast-planner
   depends:
   - ros-noetic-xgc2-planner-all (>= 1.1.0-10)
-  - ros-noetic-xgc2-mockamap (>= 1.1.4-10)
   - libboost-dev
   - libeigen3-dev
   - libompl15
@@ -81,6 +80,8 @@ apt:
   - libyaml-cpp-dev
   - ros-noetic-pcl-ros
   - ros-noetic-vision-msgs
+  recommends:
+  - ros-noetic-xgc2-mockamap (>= 1.1.4-10)
 usage:
   install: 'sudo apt update
 
@@ -151,3 +152,8 @@ ownership:
   - /opt/ros/noetic/share/snapstack_msgs
   - /opt/ros/noetic/share/quadrotor_msgs
   - /opt/ros/noetic/share/decomp_util
+release:
+  requires:
+  - xgc2-scene-generation
+  dependency_policy:
+    xgc2-scene-generation: verify

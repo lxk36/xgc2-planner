@@ -71,6 +71,8 @@ grep -q "PKG_CHECK_MODULES(YAMLCPP REQUIRED yaml-cpp)" "${REPO_ROOT}/jps3d/CMake
 grep -q "libboost-dev" "${REPO_ROOT}/.xgc2/scripts/build_debs_in_docker.sh"
 grep -q "libyaml-cpp-dev" "${REPO_ROOT}/.xgc2/scripts/build_debs_in_docker.sh"
 grep -q "ros-noetic-xgc2-mockamap (>= 1.1.4-10)" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
+grep -q '^  recommends:$' "${REPO_ROOT}/.xgc2/product.yml"
+grep -q 'Recommends: ros-noetic-xgc2-mockamap (>= 1.1.4-10)' "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-planner-common" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-jps3d" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q "ros-noetic-xgc2-intent-mpc" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"

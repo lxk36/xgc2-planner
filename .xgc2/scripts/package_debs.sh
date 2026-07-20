@@ -76,9 +76,11 @@ write_control() {
   local package="$2"
   local depends="$3"
   local description="$4"
+  local extra_fields="${5:-}"
 
   mkdir -p "${pkg_root}/DEBIAN" "${pkg_root}/usr/share/doc/${package}"
-  cat > "${pkg_root}/DEBIAN/control" <<EOF
+  {
+    cat <<EOF
 Package: ${package}
 Version: ${VERSION}
 Section: misc
@@ -86,8 +88,14 @@ Priority: optional
 Architecture: ${ARCH}
 Maintainer: XGC2 <apt@example.com>
 Depends: ${depends}
+EOF
+    if [[ -n "${extra_fields}" ]]; then
+      printf '%s\n' "${extra_fields}"
+    fi
+    cat <<EOF
 Description: ${description}
 EOF
+  } > "${pkg_root}/DEBIAN/control"
   printf '%s package\n' "${package}" > "${pkg_root}/usr/share/doc/${package}/README"
   chmod 0755 "${pkg_root}/DEBIAN"
 }
@@ -144,6 +152,11 @@ build_ros_group_deb() {
   local depends="$2"
   local description="$3"
   shift 3
+  local extra_fields=""
+  if [[ "${1:-}" == Recommends:* ]]; then
+    extra_fields="$1"
+    shift
+  fi
   local ros_packages=("$@")
 
   local pkg_root="${BUILD_DIR}/${package}"
@@ -156,7 +169,7 @@ build_ros_group_deb() {
 
   prune_non_runtime_payload "${pkg_root}"
   assert_no_non_runtime_payload "${pkg_root}"
-  write_control "${pkg_root}" "${package}" "${depends}" "${description}"
+  write_control "${pkg_root}" "${package}" "${depends}" "${description}" "${extra_fields}"
   fakeroot dpkg-deb --build "${pkg_root}" "${OUTPUT_DIR}/${package}_${VERSION}_${ARCH}.deb" >/dev/null
 }
 
@@ -195,8 +208,9 @@ case "${PACKAGE_GROUP}" in
   gcopter)
     build_ros_group_deb \
       "${gcopter_pkg}" \
-      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot, ros-noetic-xgc2-mockamap (>= 1.1.4-10)" \
+      "libeigen3-dev, libompl15, ros-noetic-roscpp, ros-noetic-std-msgs, ros-noetic-geometry-msgs, ros-noetic-sensor-msgs, ros-noetic-visualization-msgs, ros-noetic-rviz, ros-noetic-rqt-plot" \
       "XGC2 GCOPTER trajectory optimizer for ROS1" \
+      "Recommends: ros-noetic-xgc2-mockamap (>= 1.1.4-10)" \
       gcopter
     ;;
   jps3d)
