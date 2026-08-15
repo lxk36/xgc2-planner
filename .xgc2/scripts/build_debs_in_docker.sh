@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-DOCKER_IMAGE="${DOCKER_IMAGE:-ros:noetic-ros-base-focal}"
+DOCKER_IMAGE="${DOCKER_IMAGE:-ghcr.io/xgc-team/xgc2-images/xgc2-build-focal-ros-noetic:1.0.0}"
 WORK_DIR="${WORK_DIR:-${REPO_ROOT}/.work/docker}"
 OUTPUT_DIR="${OUTPUT_DIR:-${REPO_ROOT}/debs}"
 INSTALL_CHECK="${INSTALL_CHECK:-true}"
@@ -70,70 +70,7 @@ docker run --rm \
     set -euo pipefail
 
     export DEBIAN_FRONTEND=noninteractive
-    apt-get update
-    apt-get install -y --no-install-recommends \
-      build-essential \
-      ca-certificates \
-      cmake \
-      curl \
-      dpkg-dev \
-      fakeroot \
-      file \
-      git \
-      libcgal-dev \
-      libboost-dev \
-      libeigen3-dev \
-      libglpk-dev \
-      libgmp-dev \
-      libmpfr-dev \
-      libnlopt-cxx-dev \
-      libnlopt-dev \
-      libogre-1.9-dev \
-      libompl-dev \
-      libopencv-dev \
-      libqt5x11extras5-dev \
-      libyaml-cpp-dev \
-      pkg-config \
-      python3-yaml \
-      rsync \
-      ros-noetic-actionlib-msgs \
-      ros-noetic-cmake-modules \
-      ros-noetic-cv-bridge \
-      ros-noetic-gazebo-msgs \
-      ros-noetic-geometry-msgs \
-      ros-noetic-image-transport \
-      ros-noetic-interactive-markers \
-      ros-noetic-jsk-rviz-plugins \
-      ros-noetic-mavros \
-      ros-noetic-mavros-msgs \
-      ros-noetic-message-filters \
-      ros-noetic-message-generation \
-      ros-noetic-message-runtime \
-      ros-noetic-nav-msgs \
-      ros-noetic-octomap-ros \
-      ros-noetic-pcl-conversions \
-      ros-noetic-pcl-ros \
-      ros-noetic-roscpp \
-      ros-noetic-roslint \
-      ros-noetic-roslib \
-      ros-noetic-rospack \
-      ros-noetic-rospy \
-      ros-noetic-rqt-gui \
-      ros-noetic-rqt-gui-py \
-      ros-noetic-rqt-plot \
-      ros-noetic-rviz \
-      ros-noetic-sensor-msgs \
-      ros-noetic-shape-msgs \
-      ros-noetic-std-msgs \
-      ros-noetic-std-srvs \
-      ros-noetic-tf \
-      ros-noetic-tf2-eigen \
-      ros-noetic-tf2-geometry-msgs \
-      ros-noetic-tf2-ros \
-      ros-noetic-trajectory-msgs \
-      ros-noetic-vision-msgs \
-      ros-noetic-visualization-msgs
-
+    
     rm -rf /workspace/work/src /workspace/work/build /workspace/work/devel /workspace/work/install-root
     mkdir -p /workspace/work/src
 
