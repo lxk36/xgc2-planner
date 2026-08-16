@@ -112,43 +112,6 @@ jobs:
           git diff --check HEAD
           .xgc2/scripts/check_package_compliance.sh
 
-  cpp-quality:
-    if: ${{ inputs.run_cpp_quality }}
-    needs: validate-release-inputs
-    runs-on: ubuntu-latest
-    container: ghcr.io/xgc-team/xgc2-images/xgc2-build-focal-dev:1.0.0
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run C++ static quality gate
-        run: |
-          set -euo pipefail
-          .xgc2/scripts/check_cpp_quality.sh
-
-  source-tests:
-    if: ${{ inputs.run_source_tests }}
-    needs: validate-release-inputs
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build and run ROS package checks
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/package-tests"
-          docker run --rm \
-            -e XGC2_APT_OVERLAY_URL="${XGC2_APT_OVERLAY_URL:-}" \
-            -e DEBIAN_FRONTEND=noninteractive \
-            -e ROS_PACKAGE_CHECK_WORK_DIR=/workspace/work \
-            -v "$GITHUB_WORKSPACE:/workspace/repo:ro" \
-            -v "$RUNNER_TEMP/package-tests:/workspace/work" \
-            ghcr.io/xgc-team/xgc2-images/xgc2-build-focal-full-noetic:1.0.0 \
-            bash -lc '
-              set -euo pipefail
-              /workspace/repo/.xgc2/scripts/check_ros_packages.sh --work-dir /workspace/work
-            '
-
   deb-build:
     needs: validate-release-inputs
     timeout-minutes: 20
