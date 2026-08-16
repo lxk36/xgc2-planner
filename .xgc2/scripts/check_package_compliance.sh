@@ -68,8 +68,13 @@ grep -q "<name>fast_plan_manage</name>" "${REPO_ROOT}/fast_planner/fast_plan_man
 grep -q "<name>ego_planner</name>" "${REPO_ROOT}/ego_planner/ego_planner/package.xml"
 grep -q "find_package(ompl REQUIRED)" "${REPO_ROOT}/gcopter/CMakeLists.txt"
 grep -q "PKG_CHECK_MODULES(YAMLCPP REQUIRED yaml-cpp)" "${REPO_ROOT}/jps3d/CMakeLists.txt"
-grep -q "xgc2-build-focal-full-noetic" "${REPO_ROOT}/.xgc2/scripts/build_debs_in_docker.sh"
-grep -q "ROS_MASTER_URI" "${REPO_ROOT}/.xgc2/scripts/build_debs_in_docker.sh"
+BUILD_SCRIPT="${REPO_ROOT}/.xgc2/scripts/build_debs_in_docker.sh"
+grep -q 'xgc2-build-focal-full-noetic:1.0.0' "${BUILD_SCRIPT}"
+grep -q 'ROS_MASTER_URI' "${BUILD_SCRIPT}"
+if rg -n 'apt-get (update|install)' "${BUILD_SCRIPT}"; then
+  echo "build dependencies must come from the XGC2 image" >&2
+  exit 1
+fi
 grep -q "ros-noetic-xgc2-mockamap (>= 1.1.4-10)" "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
 grep -q '^  recommends:$' "${REPO_ROOT}/.xgc2/product.yml"
 grep -q 'Recommends: ros-noetic-xgc2-mockamap (>= 1.1.4-10)' "${REPO_ROOT}/.xgc2/scripts/package_debs.sh"
