@@ -46,6 +46,7 @@ set(SOURCE_FILES
   ${MOC_FILES})
 
 add_library(decomp_rviz_plugins ${SOURCE_FILES})
+add_dependencies(decomp_rviz_plugins ${catkin_EXPORTED_TARGETS})
 target_link_libraries(decomp_rviz_plugins ${QT_LIBRARIES} ${catkin_LIBRARIES} ${rviz_DEFAULT_PLUGIN_LIBRARIES})
 
 install(TARGETS decomp_rviz_plugins
